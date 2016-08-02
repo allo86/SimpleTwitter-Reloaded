@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="colorPrimary">@color/logo_blue</color>
+    <color name="colorPrimaryDark">@color/dark_blue</color>
+    <color name="colorAccent">@color/verified_blue</color>
+
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+    <color name="clear">#00000000</color>
+
+    <color name="dark_blue">#0084b4</color>
+    <color name="logo_blue">#00aced</color>
+    <color name="verified_blue">#1dcaff</color>
+    <color name="background_blue">#c0deed</color>
+
+</resources>
