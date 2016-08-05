@@ -2,11 +2,14 @@ package com.codepath.apps.allotweets.model;
 
 import com.google.gson.annotations.SerializedName;
 
+import org.parceler.Parcel;
+
 import java.util.ArrayList;
 
 /**
  * Created by ALLO on 1/8/16.
  */
+@Parcel
 public class Coordinates {
 
     @SerializedName("type")

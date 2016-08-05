@@ -14,4 +14,6 @@
     <color name="verified_blue">#1dcaff</color>
     <color name="background_blue">#c0deed</color>
 
+    <color name="light_gray">#CCCCCC</color>
+
 </resources>

@@ -1,0 +1,81 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/compose_tweet_padding"
+    tools:context="com.codepath.apps.allotweets.ui.compose.ComposeTweetFragment">
+
+    <RelativeLayout
+        android:id="@+id/top_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/bt_close"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:src="@drawable/ic_close"
+            tools:ignore="ContentDescription" />
+
+        <ImageView
+            android:id="@+id/iv_profile"
+            android:layout_width="@dimen/avatar_size"
+            android:layout_height="@dimen/avatar_size"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            tools:ignore="ContentDescription" />
+
+    </RelativeLayout>
+
+    <com.codepath.apps.allotweets.ui.base.TextView
+        android:id="@+id/tv_in_reply"
+        style="@style/tweet_alias"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/top_container"
+        android:text="@string/in_reply_to" />
+
+    <com.codepath.apps.allotweets.ui.base.EditText
+        android:id="@+id/et_status"
+        style="@style/input_status"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/bottom_toolbar"
+        android:layout_below="@+id/tv_in_reply"
+        android:layout_marginBottom="@dimen/activity_vertical_margin_half"
+        android:layout_marginTop="@dimen/activity_vertical_margin_half" />
+
+    <RelativeLayout
+        android:id="@+id/bottom_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true">
+
+        <com.codepath.apps.allotweets.ui.base.TextView
+            android:id="@+id/tv_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_toLeftOf="@+id/bt_tweet"
+            android:layout_toStartOf="@+id/bt_tweet"
+            tools:text="160" />
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/bt_tweet"
+            style="@style/tweet_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:text="@string/tweet" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

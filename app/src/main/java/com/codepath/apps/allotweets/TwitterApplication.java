@@ -2,6 +2,7 @@ package com.codepath.apps.allotweets;
 
 import android.content.Context;
 
+import com.codepath.apps.allotweets.model.TwitterUser;
 import com.codepath.apps.allotweets.network.TwitterClient;
 
 /*

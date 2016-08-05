@@ -34,6 +34,8 @@ dependencies {
     compile 'com.android.support:support-v4:24.1.1'
     // Picasso for remote image loading
     compile 'com.squareup.picasso:picasso:2.5.2'
+    // Picasso Transformations
+    compile 'jp.wasabeef:picasso-transformations:2.1.0'
     // Android Async Http for sending async network requests
     compile 'com.loopj.android:android-async-http:1.4.9'
     // ActiveAndroid for simple persistence with an ORM
@@ -46,4 +48,9 @@ dependencies {
     // Icepick
     compile 'frankiesardo:icepick:3.2.0'
     provided 'frankiesardo:icepick-processor:3.2.0'
+    // Parceler
+    compile 'org.parceler:parceler-api:1.1.1'
+    apt 'org.parceler:parceler:1.1.1'
+    // CircularImageView
+    compile 'com.pkmmte.view:circularimageview:1.1'
 }

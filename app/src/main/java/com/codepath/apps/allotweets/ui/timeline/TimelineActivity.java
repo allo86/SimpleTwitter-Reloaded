@@ -1,6 +1,8 @@
 package com.codepath.apps.allotweets.ui.timeline;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -12,14 +14,22 @@ import com.codepath.apps.allotweets.network.TwitterError;
 import com.codepath.apps.allotweets.network.callbacks.HomeTimelineCallback;
 import com.codepath.apps.allotweets.network.request.HomeTimelineRequest;
 import com.codepath.apps.allotweets.ui.base.BaseActivity;
+import com.codepath.apps.allotweets.ui.compose.ComposeTweetFragment;
+import com.codepath.apps.allotweets.ui.details.TweetDetailActivity;
+import com.codepath.apps.allotweets.ui.utils.DividerItemDecoration;
 import com.codepath.apps.allotweets.ui.utils.EndlessRecyclerViewScrollListener;
 import com.codepath.apps.allotweets.ui.utils.LinearLayoutManager;
 
+import org.parceler.Parcels;
+
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import butterknife.BindView;
+import butterknife.OnClick;
 
-public class TimelineActivity extends BaseActivity {
+public class TimelineActivity extends BaseActivity implements ComposeTweetFragment.OnComposeTweetFragmentListener {
 
     @BindView(R.id.swipe_container)
     SwipeRefreshLayout mSwipeToRefresh;
@@ -40,6 +50,9 @@ public class TimelineActivity extends BaseActivity {
     protected void initializeUI() {
         mRecyclerView.setHasFixedSize(true);
 
+        RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST);
+        mRecyclerView.addItemDecoration(itemDecoration);
+
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
@@ -49,7 +62,7 @@ public class TimelineActivity extends BaseActivity {
                 // Triggered only when new data needs to be appended to the list
                 // Add whatever code is needed to append new items to the bottom of the list
                 Log.d(TAG_LOG, "loadNextPage: " + String.valueOf(page));
-                loadTimeline(mTweets.get(totalItemsCount - 1).getTweetId());
+                loadTimeline(null, mTweets.get(totalItemsCount - 1).getTweetId());
             }
         };
         mRecyclerView.addOnScrollListener(endlessListener);
@@ -66,7 +79,11 @@ public class TimelineActivity extends BaseActivity {
         mSwipeToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                loadTimeline(null);
+                if (mTweets != null) {
+                    loadTimeline(mTweets.get(0).getTweetId(), null);
+                } else {
+                    loadTimeline(null, null);
+                }
             }
         });
         mSwipeToRefresh.setColorSchemeResources(R.color.colorPrimary,
@@ -85,13 +102,16 @@ public class TimelineActivity extends BaseActivity {
         if (mTweets != null) {
             mAdapter.notifyDataSetChanged(mTweets);
         } else {
-            loadTimeline(null);
+            loadTimeline(null, null);
         }
     }
 
-    private void loadTimeline(Long sinceId) {
+    private void loadTimeline(Long sinceId, Long maxId) {
+        Toast.makeText(TimelineActivity.this, R.string.loading_more_tweets, Toast.LENGTH_SHORT).show();
+
         HomeTimelineRequest request = new HomeTimelineRequest();
         request.setSinceId(sinceId);
+        request.setMaxId(maxId);
 
         mTwitterClient.getHomeTimeline(request, new HomeTimelineCallback() {
             @Override
@@ -105,9 +125,13 @@ public class TimelineActivity extends BaseActivity {
                             mTweets.add(tweet);
                         }
                     }
-                    mAdapter.notifyDataSetChanged(mTweets);
+                    Collections.sort(mTweets, new Comparator<Tweet>() {
+                        public int compare(Tweet t1, Tweet t2) {
+                            return t2.getCreatedAt().compareTo(t1.getCreatedAt());
+                        }
+                    });
                 }
-                mAdapter.notifyDataSetChanged(tweets);
+                mAdapter.notifyDataSetChanged(mTweets);
 
                 updateToolbarBehaviour();
 
@@ -139,6 +163,36 @@ public class TimelineActivity extends BaseActivity {
     }
 
     private void goToTweetDetails(Tweet tweet) {
+        Intent intent = new Intent(this, TweetDetailActivity.class);
+        intent.putExtra(TweetDetailActivity.TWEET, Parcels.wrap(tweet));
+        startActivityForResult(intent, TweetDetailActivity.REQUEST_CODE);
+    }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // Check which request we're responding to
+        if (requestCode == TweetDetailActivity.REQUEST_CODE) {
+            // Make sure the request was successful
+            if (resultCode == RESULT_OK) {
+                boolean refreshTweets = data.getExtras().getBoolean(TweetDetailActivity.REFRESH_TWEETS);
+                if (refreshTweets) {
+                    loadTimeline(null, null);
+                }
+            }
+        }
+    }
+
+    @OnClick(R.id.fab_tweet)
+    public void composeTweet() {
+        FragmentManager fm = getSupportFragmentManager();
+        ComposeTweetFragment editNameDialogFragment = ComposeTweetFragment.newInstance();
+        editNameDialogFragment.show(fm, "compose_tweet");
+    }
+
+    @Override
+    public void onStatusUpdated(Tweet tweet) {
+        mTweets.add(0, tweet);
+        mAdapter.notifyDataSetChanged(mTweets);
+        mLayoutManager.scrollToPosition(0);
     }
 }

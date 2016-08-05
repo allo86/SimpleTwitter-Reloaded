@@ -4,13 +4,18 @@ import android.text.format.DateUtils;
 
 import com.google.gson.annotations.SerializedName;
 
+import org.parceler.Parcel;
+
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.Locale;
 
 /**
+ * Tweet
+ * <p/>
  * Created by ALLO on 1/8/16.
  */
+@Parcel
 public class Tweet {
 
     @SerializedName("id")
@@ -37,8 +42,17 @@ public class Tweet {
     @SerializedName("retweeted")
     boolean retweeted;
 
+    @SerializedName("retweet_count")
+    int retweetCount;
+
+    @SerializedName("favorite_count")
+    int favoriteCount;
+
     @SerializedName("user")
     TwitterUser user;
+
+    @SerializedName("entities")
+    Entities entities;
 
     public Tweet() {
 
@@ -108,12 +122,36 @@ public class Tweet {
         this.retweeted = retweeted;
     }
 
+    public int getRetweetCount() {
+        return retweetCount;
+    }
+
+    public void setRetweetCount(int retweetCount) {
+        this.retweetCount = retweetCount;
+    }
+
+    public int getFavoriteCount() {
+        return favoriteCount;
+    }
+
+    public void setFavoriteCount(int favoriteCount) {
+        this.favoriteCount = favoriteCount;
+    }
+
     public TwitterUser getUser() {
         return user;
     }
 
     public void setUser(TwitterUser user) {
         this.user = user;
+    }
+
+    public Entities getEntities() {
+        return entities;
+    }
+
+    public void setEntities(Entities entities) {
+        this.entities = entities;
     }
 
     public String getFormattedCreatedAtDate() {

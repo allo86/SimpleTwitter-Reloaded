@@ -1,21 +1,35 @@
 package com.codepath.apps.allotweets.ui.login;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
+import android.widget.Toast;
 
 import com.codepath.apps.allotweets.R;
+import com.codepath.apps.allotweets.TwitterApplication;
+import com.codepath.apps.allotweets.data.DataManager;
+import com.codepath.apps.allotweets.model.TwitterUser;
 import com.codepath.apps.allotweets.network.TwitterClient;
+import com.codepath.apps.allotweets.network.TwitterError;
+import com.codepath.apps.allotweets.network.callbacks.AuthenticatedUserProfileCallback;
 import com.codepath.apps.allotweets.ui.timeline.TimelineActivity;
 import com.codepath.oauth.OAuthLoginActionBarActivity;
 
 public class LoginActivity extends OAuthLoginActionBarActivity<TwitterClient> {
 
+    private ProgressDialog pd;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        pd = new ProgressDialog(this);
+        pd.setTitle(R.string.loading);
+        pd.setMessage(getString(R.string.loading_user_profile));
+        pd.setCancelable(false);
     }
 
     // Inflate the menu; this adds items to the action bar if it is present.
@@ -29,9 +43,23 @@ public class LoginActivity extends OAuthLoginActionBarActivity<TwitterClient> {
     // i.e Display application "homepage"
     @Override
     public void onLoginSuccess() {
-        Intent i = new Intent(this, TimelineActivity.class);
-        startActivity(i);
-        finish();
+        if (pd != null && !pd.isShowing()) {
+            pd.show();
+        }
+
+        TwitterClient twitterClient = TwitterApplication.getRestClient();
+        twitterClient.getAuthenticatedUserProfile(new AuthenticatedUserProfileCallback() {
+            @Override
+            public void onSuccess(TwitterUser user) {
+                DataManager.sharedInstance().setUser(user);
+                goToTimeline();
+            }
+
+            @Override
+            public void onError(TwitterError error) {
+                Toast.makeText(LoginActivity.this, error.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     // OAuth authentication flow failed, handle the error
@@ -46,6 +74,18 @@ public class LoginActivity extends OAuthLoginActionBarActivity<TwitterClient> {
     // This should be tied to a button used to login
     public void loginToRest(View view) {
         getClient().connect();
+    }
+
+    private void goToTimeline() {
+        Intent i = new Intent(this, TimelineActivity.class);
+        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(i);
+
+        if (pd != null && pd.isShowing()) {
+            pd.dismiss();
+        }
+
+        finish();
     }
 
 }

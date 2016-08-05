@@ -2,6 +2,25 @@
 <resources>
 
     <string name="app_name">SimpleTweets</string>
-    <string name="login_label">Connect with Twitter</string>
+
+    <string name="loading">Loading &#8230;</string>
+
+    <!-- Log in -->
+    <string name="welcome_title">Welcome to Twitter</string>
+    <string name="welcome_message">Get real-time updates about what matters to you</string>
+    <string name="login_label">Log in</string>
+    <string name="loading_user_profile">Retrieving user profile &#8230;</string>
+
+    <!-- Home Timeline -->
+    <string name="loading_more_tweets">Loading more tweets &#8230;</string>
+
+    <!-- Compose Tweet -->
+    <string name="tweet">Tweet</string>
+    <string name="in_reply_to">In reply to \@%1$s</string>
+
+    <!-- Tweet detail -->
+    <string name="number_of_retweets">%1$s RETWEETS</string>
+    <string name="number_of_likes">%1$s LIKES</string>
+    <string name="share_title">Share Tweet with &#8230;</string>
 
 </resources>

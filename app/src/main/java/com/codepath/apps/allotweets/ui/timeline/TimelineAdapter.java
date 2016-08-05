@@ -4,17 +4,22 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.codepath.apps.allotweets.R;
 import com.codepath.apps.allotweets.model.Tweet;
 import com.codepath.apps.allotweets.ui.base.TextView;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import jp.wasabeef.picasso.transformations.RoundedCornersTransformation;
 
 /**
+ * TimelineAdapter
+ * <p/>
  * Created by ALLO on 1/8/16.
  */
 public class TimelineAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -70,6 +75,15 @@ public class TimelineAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         private Tweet tweet;
 
+        @BindView(R.id.iv_avatar)
+        ImageView ivAvatar;
+
+        @BindView(R.id.tv_name)
+        TextView tvName;
+
+        @BindView(R.id.tv_user)
+        TextView tvUser;
+
         @BindView(R.id.tv_text)
         TextView tvText;
 
@@ -91,6 +105,15 @@ public class TimelineAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         public void configureViewWithTweet(Tweet tweet) {
             this.tweet = tweet;
 
+            Picasso.with(ivAvatar.getContext())
+                    .load(tweet.getUser().getProfileImageUrl())
+                    .placeholder(R.drawable.ic_twitter)
+                    .fit()
+                    .transform(new RoundedCornersTransformation(10, 10))
+                    .into(ivAvatar);
+
+            tvName.setText(tweet.getUser().getName());
+            tvUser.setText(tweet.getUser().getScreenname());
             tvText.setText(tweet.getText());
             tvDate.setText(tweet.getRelativeTimeAgo());
         }

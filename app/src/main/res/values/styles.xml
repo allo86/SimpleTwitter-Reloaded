@@ -24,4 +24,88 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <!-- Login -->
+    <style name="login_instructions">
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">@dimen/login_instructions_font_size</item>
+    </style>
+
+    <style name="tweet_name">
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">@dimen/tweet_name_font_size</item>
+    </style>
+
+    <style name="tweet_alias">
+        <item name="android:textColor">@color/light_gray</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">@dimen/tweet_alias_font_size</item>
+    </style>
+
+    <style name="tweet_status">
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">@dimen/tweet_status_font_size</item>
+    </style>
+
+    <style name="tweet_date">
+        <item name="android:textColor">@color/light_gray</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">@dimen/tweet_date_font_size</item>
+    </style>
+
+    <style name="input_status">
+        <item name="android:gravity">top|left</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:maxLength">160</item>
+        <item name="android:textSize">@dimen/input_status_font_size</item>
+    </style>
+
+    <style name="base_button">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">@dimen/button_font_size</item>
+    </style>
+
+    <style name="login_button" parent="base_button">
+        <item name="android:backgroundTint">@color/colorPrimaryDark</item>
+    </style>
+
+    <style name="tweet_button" parent="base_button">
+        <item name="backgroundTint">@color/tweet_button_background_selector</item>
+    </style>
+
+    <!-- Details -->
+    <style name="tweet_details_name">
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">@dimen/tweet_details_name_font_size</item>
+    </style>
+
+    <style name="tweet_details_alias">
+        <item name="android:textColor">@color/light_gray</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">@dimen/tweet_details_alias_font_size</item>
+    </style>
+
+    <style name="tweet_details_status">
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">@dimen/tweet_details_status_font_size</item>
+    </style>
+
+    <style name="tweet_details_date">
+        <item name="android:textColor">@color/light_gray</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">@dimen/tweet_details_date_font_size</item>
+    </style>
+
+    <style name="tweet_details_count">
+        <item name="android:textColor">@color/light_gray</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">@dimen/tweet_details_date_font_size</item>
+    </style>
+    <!-- Details -->
+
 </resources>

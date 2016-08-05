@@ -5,9 +5,11 @@ package com.codepath.apps.allotweets.network.request;
  */
 public class HomeTimelineRequest {
 
-    private int count = 50;
+    private int count = 100;
 
     private Long sinceId;
+
+    private Long maxId;
 
     public HomeTimelineRequest() {
 
@@ -27,5 +29,13 @@ public class HomeTimelineRequest {
 
     public void setSinceId(Long sinceId) {
         this.sinceId = sinceId;
+    }
+
+    public Long getMaxId() {
+        return maxId;
+    }
+
+    public void setMaxId(Long maxId) {
+        this.maxId = maxId;
     }
 }
