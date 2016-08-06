@@ -67,6 +67,10 @@ public class Tweet extends Model {
     @Column(name = "retweet_count")
     int retweetCount;
 
+    @SerializedName("retweeted_status")
+    @Expose
+    Tweet retweetedStatus;
+
     @SerializedName("favorite_count")
     @Expose
     @Column(name = "favorite_count")
@@ -159,6 +163,14 @@ public class Tweet extends Model {
 
     public void setRetweetCount(int retweetCount) {
         this.retweetCount = retweetCount;
+    }
+
+    public Tweet getRetweetedStatus() {
+        return retweetedStatus;
+    }
+
+    public void setRetweetedStatus(Tweet retweetedStatus) {
+        this.retweetedStatus = retweetedStatus;
     }
 
     public int getFavoriteCount() {

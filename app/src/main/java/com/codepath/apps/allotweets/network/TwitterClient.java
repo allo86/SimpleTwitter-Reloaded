@@ -6,11 +6,15 @@ import com.codepath.apps.allotweets.model.Size;
 import com.codepath.apps.allotweets.model.Tweet;
 import com.codepath.apps.allotweets.model.TwitterUser;
 import com.codepath.apps.allotweets.network.callbacks.AuthenticatedUserProfileCallback;
+import com.codepath.apps.allotweets.network.callbacks.FavoriteTweetCallback;
 import com.codepath.apps.allotweets.network.callbacks.HomeTimelineCallback;
 import com.codepath.apps.allotweets.network.callbacks.PostTweetCallback;
+import com.codepath.apps.allotweets.network.callbacks.RetweetCallback;
 import com.codepath.apps.allotweets.network.deserializer.DateDeserializer;
 import com.codepath.apps.allotweets.network.deserializer.SizeDeserializer;
+import com.codepath.apps.allotweets.network.request.FavoriteTweetRequest;
 import com.codepath.apps.allotweets.network.request.HomeTimelineRequest;
+import com.codepath.apps.allotweets.network.request.RetweetRequest;
 import com.codepath.apps.allotweets.network.request.TweetRequest;
 import com.codepath.oauth.OAuthBaseClient;
 import com.google.gson.Gson;
@@ -77,8 +81,8 @@ public class TwitterClient extends OAuthBaseClient {
     /**
      * Home Timeline
      *
-     * @param request
-     * @param callback
+     * @param request  Request
+     * @param callback Callback
      */
     public void getHomeTimeline(HomeTimelineRequest request,
                                 final HomeTimelineCallback callback) {
@@ -115,7 +119,7 @@ public class TwitterClient extends OAuthBaseClient {
     /**
      * Authenticated user profile
      *
-     * @param callback
+     * @param callback Callback
      */
     public void getAuthenticatedUserProfile(final AuthenticatedUserProfileCallback callback) {
         String apiUrl = getApiUrl("account/verify_credentials.json");
@@ -137,6 +141,12 @@ public class TwitterClient extends OAuthBaseClient {
         });
     }
 
+    /**
+     * Create Tweet
+     *
+     * @param request  Request
+     * @param callback Callback
+     */
     public void postTweet(TweetRequest request,
                           final PostTweetCallback callback) {
         String apiUrl = getApiUrl("statuses/update.json");
@@ -156,6 +166,72 @@ public class TwitterClient extends OAuthBaseClient {
                 params.put("long", request.getLongitude());
             }
         }
+
+        client.post(apiUrl, params, new TextHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                Gson gson = getGson();
+                Tweet tweet = gson.fromJson(responseString, Tweet.class);
+                callback.onSuccess(tweet);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                callback.onError(new TwitterError(throwable != null ? throwable.getMessage() : null));
+            }
+        });
+    }
+
+    /**
+     * Retweet
+     *
+     * @param request  Request
+     * @param callback Callback
+     */
+    public void retweet(final RetweetRequest request,
+                        final RetweetCallback callback) {
+        String apiUrl;
+        if (request.isUndo()) {
+            apiUrl = getApiUrl(String.format("statuses/unretweet/%1$s.json", request.getTweetId().toString()));
+        } else {
+            apiUrl = getApiUrl(String.format("statuses/retweet/%1$s.json", request.getTweetId().toString()));
+        }
+
+        RequestParams params = new RequestParams();
+        params.put("id", request.getTweetId());
+
+        client.post(apiUrl, params, new TextHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                Gson gson = getGson();
+                Tweet tweet = gson.fromJson(responseString, Tweet.class);
+                callback.onSuccess(tweet);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                callback.onError(new TwitterError(throwable != null ? throwable.getMessage() : null));
+            }
+        });
+    }
+
+    /**
+     * Mark tweet as favorite
+     *
+     * @param request  Request
+     * @param callback Callback
+     */
+    public void markAsFavorite(FavoriteTweetRequest request,
+                               final FavoriteTweetCallback callback) {
+        String apiUrl;
+        if (request.isUndo()) {
+            apiUrl = getApiUrl("favorites/destroy.json");
+        } else {
+            apiUrl = getApiUrl("favorites/create.json");
+        }
+
+        RequestParams params = new RequestParams();
+        params.put("id", request.getTweetId());
 
         client.post(apiUrl, params, new TextHttpResponseHandler() {
             @Override

@@ -14,10 +14,16 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.codepath.apps.allotweets.R;
 import com.codepath.apps.allotweets.model.Media;
 import com.codepath.apps.allotweets.model.Tweet;
+import com.codepath.apps.allotweets.network.TwitterError;
+import com.codepath.apps.allotweets.network.callbacks.FavoriteTweetCallback;
+import com.codepath.apps.allotweets.network.callbacks.RetweetCallback;
+import com.codepath.apps.allotweets.network.request.FavoriteTweetRequest;
+import com.codepath.apps.allotweets.network.request.RetweetRequest;
 import com.codepath.apps.allotweets.ui.base.BaseActivity;
 import com.codepath.apps.allotweets.ui.base.TextView;
 import com.codepath.apps.allotweets.ui.compose.ComposeTweetFragment;
@@ -29,6 +35,7 @@ import org.parceler.Parcels;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import icepick.State;
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation;
 
 public class TweetDetailActivity extends BaseActivity implements ComposeTweetFragment.OnComposeTweetFragmentListener {
@@ -74,9 +81,17 @@ public class TweetDetailActivity extends BaseActivity implements ComposeTweetFra
     @BindView(R.id.pb_image)
     ProgressBar pbImage;
 
-    private Tweet mTweet;
+    @BindView(R.id.pb_retweet)
+    ProgressBar pbRetweet;
 
-    private boolean refreshTweets;
+    @BindView(R.id.pb_favorite)
+    ProgressBar pbFavorite;
+
+    @State(TweetDetailActivityBundler.class)
+    Tweet mTweet;
+
+    @State
+    boolean refreshTweets;
 
     @Override
     protected int getLayoutResourceID() {
@@ -131,6 +146,16 @@ public class TweetDetailActivity extends BaseActivity implements ComposeTweetFra
             photoContainer.setVisibility(View.GONE);
         }
 
+        updateRetweet();
+        updateFavorite();
+    }
+
+    private void updateRetweet() {
+        btRetweet.setVisibility(View.VISIBLE);
+        pbRetweet.setVisibility(View.INVISIBLE);
+
+        btRetweet.setImageResource(mTweet.isRetweeted() ? R.drawable.ic_retweet_done : R.drawable.ic_retweet);
+
         Spannable spanRetweets = new SpannableString(getString(R.string.number_of_retweets, String.valueOf(mTweet.getRetweetCount())));
         spanRetweets.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this, R.color.black)),
                 0,
@@ -141,6 +166,13 @@ public class TweetDetailActivity extends BaseActivity implements ComposeTweetFra
                 String.valueOf(mTweet.getRetweetCount()).length(),
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         tvRetweets.setText(spanRetweets);
+    }
+
+    private void updateFavorite() {
+        btFavorite.setVisibility(View.VISIBLE);
+        pbFavorite.setVisibility(View.INVISIBLE);
+
+        btFavorite.setImageResource(mTweet.isFavorite() ? R.drawable.ic_favorite_done : R.drawable.ic_favorite);
 
         Spannable spanLikes = new SpannableString(getString(R.string.number_of_likes, String.valueOf(mTweet.getFavoriteCount())));
         spanLikes.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this, R.color.black)),
@@ -152,17 +184,6 @@ public class TweetDetailActivity extends BaseActivity implements ComposeTweetFra
                 String.valueOf(mTweet.getFavoriteCount()).length(),
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         tvLikes.setText(spanLikes);
-
-        updateRetweet();
-        updateFavorite();
-    }
-
-    private void updateRetweet() {
-        btRetweet.setImageResource(mTweet.isRetweeted() ? R.drawable.ic_retweet_done : R.drawable.ic_retweet);
-    }
-
-    private void updateFavorite() {
-        btFavorite.setImageResource(mTweet.isFavorite() ? R.drawable.ic_favorite_done : R.drawable.ic_favorite);
     }
 
     @OnClick(R.id.bt_reply)
@@ -174,14 +195,63 @@ public class TweetDetailActivity extends BaseActivity implements ComposeTweetFra
 
     @OnClick(R.id.bt_retweet)
     public void retweet() {
-        mTweet.setRetweeted(!mTweet.isRetweeted());
-        updateRetweet();
+        btRetweet.setVisibility(View.INVISIBLE);
+        pbRetweet.setVisibility(View.VISIBLE);
+
+        final RetweetRequest request = new RetweetRequest();
+        if (mTweet.isRetweeted()) {
+            // Undo retweet
+            request.setUndo(true);
+            request.setTweetId(mTweet.getRetweetedStatus().getTweetId());
+        } else {
+            // Retweet
+            request.setUndo(false);
+            request.setTweetId(mTweet.getTweetId());
+        }
+
+        mTwitterClient.retweet(request, new RetweetCallback() {
+            @Override
+            public void onSuccess(Tweet retweet) {
+                if (request.isUndo()) {
+                    mTweet.setRetweetCount(mTweet.getRetweetCount() - 1);
+                    mTweet.setRetweetedStatus(null);
+                    mTweet.setRetweeted(false);
+                } else {
+                    mTweet.setRetweetCount(mTweet.getRetweetCount() + 1);
+                    mTweet.setRetweetedStatus(retweet);
+                    mTweet.setRetweeted(true);
+                }
+                updateRetweet();
+            }
+
+            @Override
+            public void onError(TwitterError error) {
+                Toast.makeText(TweetDetailActivity.this, R.string.error_retweet, Toast.LENGTH_LONG).show();
+                updateRetweet();
+            }
+        });
     }
 
     @OnClick(R.id.bt_favorite)
     public void favorite() {
-        mTweet.setFavorite(!mTweet.isFavorite());
-        updateFavorite();
+        btFavorite.setVisibility(View.INVISIBLE);
+        pbFavorite.setVisibility(View.VISIBLE);
+
+        FavoriteTweetRequest request = new FavoriteTweetRequest(mTweet.getTweetId(),
+                mTweet.isFavorite());
+        mTwitterClient.markAsFavorite(request, new FavoriteTweetCallback() {
+            @Override
+            public void onSuccess(Tweet retweet) {
+                mTweet = retweet;
+                updateFavorite();
+            }
+
+            @Override
+            public void onError(TwitterError error) {
+                Toast.makeText(TweetDetailActivity.this, R.string.error_favorite, Toast.LENGTH_LONG).show();
+                updateFavorite();
+            }
+        });
     }
 
     @OnClick(R.id.fab_share)
@@ -199,13 +269,10 @@ public class TweetDetailActivity extends BaseActivity implements ComposeTweetFra
 
     @Override
     public void onBackPressed() {
-        if (refreshTweets) {
-            Intent data = new Intent();
-            data.putExtra(REFRESH_TWEETS, true);
-            setResult(RESULT_OK, data);
-            finish();
-        } else {
-            super.onBackPressed();
-        }
+        Intent data = new Intent();
+        data.putExtra(TWEET, Parcels.wrap(mTweet));
+        data.putExtra(REFRESH_TWEETS, refreshTweets);
+        setResult(RESULT_OK, data);
+        finish();
     }
 }

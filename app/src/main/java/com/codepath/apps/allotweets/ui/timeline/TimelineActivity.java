@@ -147,7 +147,9 @@ public class TimelineActivity extends BaseActivity implements ComposeTweetFragme
                 mTweets = new ArrayList<>();
             }
             for (Tweet tweet : tweets) {
-                if (!mTweets.contains(tweet)) {
+                if (mTweets.contains(tweet)) {
+                    mTweets.set(mTweets.indexOf(tweet), tweet);
+                } else {
                     mTweets.add(tweet);
                 }
             }
@@ -193,6 +195,14 @@ public class TimelineActivity extends BaseActivity implements ComposeTweetFragme
         if (requestCode == TweetDetailActivity.REQUEST_CODE) {
             // Make sure the request was successful
             if (resultCode == RESULT_OK) {
+                Tweet tweet = Parcels.unwrap(data.getExtras().getParcelable(TweetDetailActivity.TWEET));
+                if (mTweets != null) {
+                    if (mTweets.indexOf(tweet) != -1) {
+                        int index = mTweets.indexOf(tweet);
+                        mTweets.set(index, tweet);
+                        mAdapter.notifyItemChanged(index);
+                    }
+                }
                 boolean refreshTweets = data.getExtras().getBoolean(TweetDetailActivity.REFRESH_TWEETS);
                 if (refreshTweets) {
                     loadTimeline(null, null);
