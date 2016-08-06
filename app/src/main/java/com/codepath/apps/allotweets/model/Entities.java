@@ -62,11 +62,26 @@ public class Entities {
         return null;
     }
 
-    public Media getVideo() {
+    public VideoInfo getVideoInfo() {
         if (media != null && media.size() > 0) {
             for (Media mediaItem : media) {
                 if (mediaItem.isVideo()) {
-                    return mediaItem;
+                    return mediaItem.getVideoInfo();
+                }
+            }
+        }
+        return null;
+    }
+
+    public VideoVariant getVideo() {
+        if (media != null && media.size() > 0) {
+            for (Media mediaItem : media) {
+                if (mediaItem.isVideo()) {
+                    if (mediaItem.getVideoInfo() != null) {
+                        if (mediaItem.getVideoInfo().getVariants() != null && mediaItem.getVideoInfo().getVariants().size() > 0) {
+                            return mediaItem.getVideoInfo().getVariants().get(0);
+                        }
+                    }
                 }
             }
         }

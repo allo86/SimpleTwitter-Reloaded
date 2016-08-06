@@ -231,8 +231,12 @@ public class Tweet extends Model {
         return entities.getPhoto();
     }
 
-    public Media getVideo() {
+    public VideoVariant getVideo() {
         return extendedEntities.getVideo();
+    }
+
+    public VideoInfo getVideoInfo() {
+        return extendedEntities.getVideoInfo();
     }
 
     // Record Finders

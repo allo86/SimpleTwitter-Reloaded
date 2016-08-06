@@ -107,12 +107,27 @@
 
             </RelativeLayout>
 
+            <RelativeLayout
+                android:id="@+id/video_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/photo_container"
+                android:layout_marginTop="@dimen/activity_vertical_margin_half">
+
+                <com.codepath.apps.allotweets.ui.utils.DynamicHeightVideoPlayerView
+                    android:id="@+id/video_player"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true" />
+
+            </RelativeLayout>
+
             <com.codepath.apps.allotweets.ui.base.TextView
                 android:id="@+id/tv_date"
                 style="@style/tweet_details_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/photo_container"
+                android:layout_below="@+id/video_container"
                 android:layout_marginBottom="@dimen/activity_vertical_margin"
                 android:layout_marginTop="@dimen/activity_vertical_margin" />
 

@@ -13,6 +13,10 @@ import java.util.ArrayList;
 @Parcel
 public class VideoInfo {
 
+    @SerializedName("aspect_Ratio")
+    @Expose
+    ArrayList<Integer> aspectRatio;
+
     @SerializedName("duration_millis")
     @Expose
     Long durationMillis;
@@ -23,6 +27,17 @@ public class VideoInfo {
 
     public VideoInfo() {
 
+    }
+
+    public double getAspectRatio() {
+        if (aspectRatio != null && aspectRatio.size() >= 2) {
+            return ((double) aspectRatio.get(0) / (double) aspectRatio.get(1));
+        }
+        return 0;
+    }
+
+    public void setAspectRatio(ArrayList<Integer> aspectRatio) {
+        this.aspectRatio = aspectRatio;
     }
 
     public Long getDurationMillis() {

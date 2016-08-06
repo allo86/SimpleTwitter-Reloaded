@@ -28,8 +28,13 @@ import com.codepath.apps.allotweets.ui.base.BaseActivity;
 import com.codepath.apps.allotweets.ui.base.TextView;
 import com.codepath.apps.allotweets.ui.compose.ComposeTweetFragment;
 import com.codepath.apps.allotweets.ui.utils.DynamicHeightImageView;
+import com.codepath.apps.allotweets.ui.utils.DynamicHeightVideoPlayerView;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
+import com.volokh.danylo.video_player_manager.manager.PlayerItemChangeListener;
+import com.volokh.danylo.video_player_manager.manager.SingleVideoPlayerManager;
+import com.volokh.danylo.video_player_manager.manager.VideoPlayerManager;
+import com.volokh.danylo.video_player_manager.meta.MetaData;
 
 import org.parceler.Parcels;
 
@@ -87,6 +92,19 @@ public class TweetDetailActivity extends BaseActivity implements ComposeTweetFra
     @BindView(R.id.pb_favorite)
     ProgressBar pbFavorite;
 
+    @BindView(R.id.video_container)
+    RelativeLayout videoContainer;
+
+    @BindView(R.id.video_player)
+    DynamicHeightVideoPlayerView videoPlayer;
+
+    private VideoPlayerManager<MetaData> mVideoPlayerManager = new SingleVideoPlayerManager(new PlayerItemChangeListener() {
+        @Override
+        public void onPlayerItemChanged(MetaData metaData) {
+
+        }
+    });
+
     @State(TweetDetailActivityBundler.class)
     Tweet mTweet;
 
@@ -122,7 +140,14 @@ public class TweetDetailActivity extends BaseActivity implements ComposeTweetFra
         tvStatus.setText(mTweet.getText());
         tvDate.setText(mTweet.getFormattedCreatedAtDate());
 
-        if (mTweet.hasPhoto()) {
+        photoContainer.setVisibility(View.GONE);
+        videoContainer.setVisibility(View.GONE);
+
+        if (mTweet.hasVideo()) {
+            videoContainer.setVisibility(View.VISIBLE);
+            videoPlayer.setHeightRatio(mTweet.getVideoInfo().getAspectRatio());
+            mVideoPlayerManager.playNewVideo(null, videoPlayer, mTweet.getVideo().getUrl());
+        } else if (mTweet.hasPhoto()) {
             photoContainer.setVisibility(View.VISIBLE);
 
             pbImage.setVisibility(View.VISIBLE);
@@ -142,8 +167,6 @@ public class TweetDetailActivity extends BaseActivity implements ComposeTweetFra
                             Log.d(TAG_LOG, "error");
                         }
                     });
-        } else {
-            photoContainer.setVisibility(View.GONE);
         }
 
         updateRetweet();
