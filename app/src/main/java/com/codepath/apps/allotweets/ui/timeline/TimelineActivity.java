@@ -10,9 +10,11 @@ import android.widget.Toast;
 
 import com.codepath.apps.allotweets.R;
 import com.codepath.apps.allotweets.model.Tweet;
+import com.codepath.apps.allotweets.model.TwitterUser;
 import com.codepath.apps.allotweets.network.TwitterError;
 import com.codepath.apps.allotweets.network.callbacks.HomeTimelineCallback;
 import com.codepath.apps.allotweets.network.request.HomeTimelineRequest;
+import com.codepath.apps.allotweets.network.utils.Utils;
 import com.codepath.apps.allotweets.ui.base.BaseActivity;
 import com.codepath.apps.allotweets.ui.compose.ComposeTweetFragment;
 import com.codepath.apps.allotweets.ui.details.TweetDetailActivity;
@@ -102,7 +104,12 @@ public class TimelineActivity extends BaseActivity implements ComposeTweetFragme
         if (mTweets != null) {
             mAdapter.notifyDataSetChanged(mTweets);
         } else {
-            loadTimeline(null, null);
+            if (Utils.isOnline()) {
+                loadTimeline(null, null);
+            } else {
+                // TODO: Load SQLite
+                loadOfflineTweets();
+            }
         }
     }
 
@@ -116,27 +123,11 @@ public class TimelineActivity extends BaseActivity implements ComposeTweetFragme
         mTwitterClient.getHomeTimeline(request, new HomeTimelineCallback() {
             @Override
             public void onSuccess(ArrayList<Tweet> tweets) {
-                if (tweets != null) {
-                    if (mTweets == null) {
-                        mTweets = new ArrayList<>();
-                    }
-                    for (Tweet tweet : tweets) {
-                        if (!mTweets.contains(tweet)) {
-                            mTweets.add(tweet);
-                        }
-                    }
-                    Collections.sort(mTweets, new Comparator<Tweet>() {
-                        public int compare(Tweet t1, Tweet t2) {
-                            return t2.getCreatedAt().compareTo(t1.getCreatedAt());
-                        }
-                    });
-                }
-                mAdapter.notifyDataSetChanged(mTweets);
+                // Save in local database
+                saveTweets(tweets);
 
-                updateToolbarBehaviour();
-
-                // Now we call setRefreshing(false) to signal refresh has finished
-                mSwipeToRefresh.setRefreshing(false);
+                // Process tweets
+                processTweets(tweets);
             }
 
             @Override
@@ -149,6 +140,35 @@ public class TimelineActivity extends BaseActivity implements ComposeTweetFragme
                 mSwipeToRefresh.setRefreshing(false);
             }
         });
+    }
+
+    private void processTweets(ArrayList<Tweet> tweets) {
+        if (tweets != null) {
+            if (mTweets == null) {
+                mTweets = new ArrayList<>();
+            }
+            for (Tweet tweet : tweets) {
+                if (!mTweets.contains(tweet)) {
+                    mTweets.add(tweet);
+                }
+            }
+            Collections.sort(mTweets, new Comparator<Tweet>() {
+                public int compare(Tweet t1, Tweet t2) {
+                    return t2.getCreatedAt().compareTo(t1.getCreatedAt());
+                }
+            });
+        }
+        mAdapter.notifyDataSetChanged(mTweets);
+
+        updateToolbarBehaviour();
+
+        // Now we call setRefreshing(false) to signal refresh has finished
+        mSwipeToRefresh.setRefreshing(false);
+    }
+
+    private void loadOfflineTweets() {
+        Toast.makeText(this, R.string.loading_offline_tweets, Toast.LENGTH_LONG).show();
+        processTweets(new ArrayList<>(Tweet.recentTweets()));
     }
 
     private void updateToolbarBehaviour() {
@@ -194,5 +214,45 @@ public class TimelineActivity extends BaseActivity implements ComposeTweetFragme
         mTweets.add(0, tweet);
         mAdapter.notifyDataSetChanged(mTweets);
         mLayoutManager.scrollToPosition(0);
+    }
+
+    private void saveTweets(ArrayList<Tweet> tweets) {
+        if (tweets != null && tweets.size() > 0) {
+            for (Tweet tweet : tweets) {
+                // Twitter User
+                TwitterUser dbTwitterUser = TwitterUser.byUserId(tweet.getUser().getUserId());
+                if (dbTwitterUser != null) {
+                    // Twitter User already existe. It may have been updated
+                    dbTwitterUser.setProfileImageUrl(tweet.getUser().getProfileImageUrl());
+                    dbTwitterUser.setName(tweet.getUser().getName());
+                    dbTwitterUser.setScreenname(tweet.getUser().getName());
+                    dbTwitterUser.save();
+                    Log.d(TAG_LOG, "user updated: " + tweet.getUser().getUserId());
+                } else {
+                    // New Twitter User. Insert new record
+                    dbTwitterUser = tweet.getUser();
+                    dbTwitterUser.save();
+                    Log.d(TAG_LOG, "user inserted: " + tweet.getUser().getUserId());
+                }
+                tweet.setUser(dbTwitterUser);
+
+                // Tweet
+                Tweet dbTweet = Tweet.byTweetId(tweet.getTweetId());
+                if (dbTweet != null) {
+                    // Tweet already existed. It may have been updated
+                    dbTweet.setText(tweet.getText());
+                    dbTweet.setCreatedAt(tweet.getCreatedAt());
+                    dbTweet.setFavorite(tweet.isFavorite());
+                    dbTweet.setRetweeted(tweet.isRetweeted());
+                    dbTweet.save();
+                    Log.d(TAG_LOG, "tweet updated: " + tweet.getTweetId());
+                } else {
+                    // New Tweet. Insert new record
+                    dbTweet = tweet;
+                    dbTweet.save();
+                    Log.d(TAG_LOG, "tweet inserted: " + tweet.getTweetId());
+                }
+            }
+        }
     }
 }

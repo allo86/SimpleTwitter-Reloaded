@@ -22,6 +22,7 @@ import com.loopj.android.http.TextHttpResponseHandler;
 import org.scribe.builder.api.Api;
 import org.scribe.builder.api.TwitterApi;
 
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -173,6 +174,8 @@ public class TwitterClient extends OAuthBaseClient {
 
     private Gson getGson() {
         return new GsonBuilder()
+                .excludeFieldsWithModifiers(Modifier.FINAL, Modifier.TRANSIENT, Modifier.STATIC)
+                .excludeFieldsWithoutExposeAnnotation()
                 .registerTypeAdapter(Date.class, new DateDeserializer())
                 .registerTypeAdapter(Size.class, new SizeDeserializer())
                 .create();

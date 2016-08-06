@@ -1,5 +1,6 @@
 package com.codepath.apps.allotweets.model;
 
+import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import org.parceler.Parcel;
@@ -11,12 +12,15 @@ import org.parceler.Parcel;
 public class VideoVariant {
 
     @SerializedName("bitrate")
+    @Expose
     int bitrate;
 
     @SerializedName("content_type")
+    @Expose
     String contentType;
 
     @SerializedName("url")
+    @Expose
     String url;
 
     public VideoVariant() {

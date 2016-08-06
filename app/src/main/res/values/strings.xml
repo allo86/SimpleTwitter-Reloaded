@@ -13,6 +13,7 @@
 
     <!-- Home Timeline -->
     <string name="loading_more_tweets">Loading more tweets &#8230;</string>
+    <string name="loading_offline_tweets">There seems to be no internet connection available. You will see the last storaged tweets</string>
 
     <!-- Compose Tweet -->
     <string name="tweet">Tweet</string>

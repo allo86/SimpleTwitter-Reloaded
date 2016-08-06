@@ -132,12 +132,17 @@ public class ComposeTweetFragment extends DialogFragment {
         // Hide title bar
         getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 
-        Picasso.with(ivAvatar.getContext())
-                .load(DataManager.sharedInstance().getUser().getProfileImageUrl())
-                .placeholder(R.drawable.ic_twitter_gray)
-                .fit()
-                .transform(new RoundedCornersTransformation(10, 10))
-                .into(ivAvatar);
+        if (DataManager.sharedInstance().getUser() != null) {
+            ivAvatar.setVisibility(View.VISIBLE);
+            Picasso.with(ivAvatar.getContext())
+                    .load(DataManager.sharedInstance().getUser().getProfileImageUrl())
+                    .placeholder(R.drawable.ic_twitter_gray)
+                    .fit()
+                    .transform(new RoundedCornersTransformation(10, 10))
+                    .into(ivAvatar);
+        } else {
+            ivAvatar.setVisibility(View.GONE);
+        }
 
         if (mTweet != null) {
             tvInReply.setText(getString(R.string.in_reply_to, mTweet.getUser().getScreenname()));

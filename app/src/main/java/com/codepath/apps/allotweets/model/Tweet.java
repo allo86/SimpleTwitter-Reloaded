@@ -2,12 +2,18 @@ package com.codepath.apps.allotweets.model;
 
 import android.text.format.DateUtils;
 
+import com.activeandroid.Model;
+import com.activeandroid.annotation.Column;
+import com.activeandroid.annotation.Table;
+import com.activeandroid.query.Select;
+import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import org.parceler.Parcel;
 
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -15,47 +21,68 @@ import java.util.Locale;
  * <p/>
  * Created by ALLO on 1/8/16.
  */
-@Parcel
-public class Tweet {
+@Parcel(analyze = Tweet.class)
+@Table(name = "tweets")
+public class Tweet extends Model {
 
     @SerializedName("id")
+    @Expose
+    @Column(name = "tweet_id", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
     Long tweetId;
 
     @SerializedName("text")
+    @Expose
+    @Column(name = "text")
     String text;
 
     @SerializedName("coordinates")
+    @Expose
     Coordinates coordinates;
 
     @SerializedName("truncated")
+    @Expose
     boolean truncated;
 
     @SerializedName("created_at")
+    @Expose
+    @Column(name = "created_at")
     Date createdAt;
 
     @SerializedName("source")
+    @Expose
     String source;
 
     @SerializedName("favorited")
+    @Expose
+    @Column(name = "favorite")
     boolean favorite;
 
     @SerializedName("retweeted")
+    @Expose
+    @Column(name = "retweeted")
     boolean retweeted;
 
     @SerializedName("retweet_count")
+    @Expose
+    @Column(name = "retweet_count")
     int retweetCount;
 
     @SerializedName("favorite_count")
+    @Expose
+    @Column(name = "favorite_count")
     int favoriteCount;
 
     @SerializedName("user")
+    @Expose
+    @Column(name = "users", onUpdate = Column.ForeignKeyAction.CASCADE, onDelete = Column.ForeignKeyAction.CASCADE)
     TwitterUser user;
 
     @SerializedName("entities")
+    @Expose
     Entities entities;
 
     public Tweet() {
-
+        super();
     }
 
     public Long getTweetId() {
@@ -164,6 +191,15 @@ public class Tweet {
     public String getRelativeTimeAgo() {
         long dateMillis = getCreatedAt().getTime();
         return DateUtils.getRelativeTimeSpanString(dateMillis, System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS).toString();
+    }
+
+    // Record Finders
+    public static Tweet byTweetId(Long tweetId) {
+        return new Select().from(Tweet.class).where("tweet_id = ?", tweetId).executeSingle();
+    }
+
+    public static List<Tweet> recentTweets() {
+        return new Select().from(Tweet.class).orderBy("id DESC").limit("300").execute();
     }
 
     @Override

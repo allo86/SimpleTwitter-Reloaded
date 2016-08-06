@@ -1,5 +1,6 @@
 package com.codepath.apps.allotweets.model;
 
+import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import org.parceler.Parcel;
@@ -11,18 +12,23 @@ import org.parceler.Parcel;
 public class Media {
 
     @SerializedName("id")
+    @Expose
     Long mediaId;
 
     @SerializedName("media_url")
+    @Expose
     String mediaUrl;
 
     @SerializedName("url")
+    @Expose
     String url;
 
     @SerializedName("type")
+    @Expose
     String type;
 
     @SerializedName("sizes")
+    @Expose
     Size size;
 
     public Media() {

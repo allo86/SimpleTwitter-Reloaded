@@ -1,5 +1,6 @@
 package com.codepath.apps.allotweets.model;
 
+import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import org.parceler.Parcel;
@@ -13,9 +14,11 @@ import java.util.ArrayList;
 public class VideoInfo {
 
     @SerializedName("duration_millis")
+    @Expose
     Long durationMillis;
 
     @SerializedName("variants")
+    @Expose
     ArrayList<VideoVariant> variants;
 
     public VideoInfo() {

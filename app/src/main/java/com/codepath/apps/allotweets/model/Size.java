@@ -1,5 +1,6 @@
 package com.codepath.apps.allotweets.model;
 
+import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import org.parceler.Parcel;
@@ -11,12 +12,15 @@ import org.parceler.Parcel;
 public class Size {
 
     @SerializedName("w")
+    @Expose
     int width;
 
     @SerializedName("")
+    @Expose
     int height;
 
     @SerializedName("resize")
+    @Expose
     String resize;
 
     public Size() {
