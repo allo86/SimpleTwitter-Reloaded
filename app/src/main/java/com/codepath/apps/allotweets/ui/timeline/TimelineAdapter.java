@@ -1,5 +1,6 @@
 package com.codepath.apps.allotweets.ui.timeline;
 
+import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -8,19 +9,20 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.codepath.apps.allotweets.R;
 import com.codepath.apps.allotweets.model.Media;
 import com.codepath.apps.allotweets.model.Tweet;
 import com.codepath.apps.allotweets.ui.base.TextView;
 import com.codepath.apps.allotweets.ui.utils.DynamicHeightImageView;
-import com.squareup.picasso.Callback;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import jp.wasabeef.picasso.transformations.RoundedCornersTransformation;
 
 /**
  * TimelineAdapter
@@ -131,12 +133,28 @@ public class TimelineAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         public void configureViewWithTweet(Tweet tweet) {
             this.tweet = tweet;
 
+            /*
             Picasso.with(ivAvatar.getContext())
                     .load(tweet.getUser().getProfileImageUrl())
                     .placeholder(R.drawable.ic_twitter)
                     .fit()
                     .transform(new RoundedCornersTransformation(10, 10))
                     .into(ivAvatar);
+            */
+            Glide.with(ivAvatar.getContext())
+                    .load(tweet.getUser().getProfileImageUrl())
+                    .placeholder(R.drawable.ic_twitter)
+                    .into(new SimpleTarget<GlideDrawable>() {
+                        @Override
+                        public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
+                            ivAvatar.setImageDrawable(resource);
+                        }
+
+                        @Override
+                        public void onLoadFailed(Exception e, Drawable errorDrawable) {
+                            Log.d(TAG_LOG, e.getMessage());
+                        }
+                    });
 
             tvName.setText(tweet.getUser().getName());
             tvUser.setText(tweet.getUser().getScreennameForDisplay());
@@ -173,6 +191,7 @@ public class TimelineAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             Media photo = tweet.getPhoto();
             ivPhoto.setHeightRatio(((double) photo.getSize().getHeight()) / photo.getSize().getWidth());
+            /*
             Picasso.with(ivPhoto.getContext()).load(photo.getMediaUrl())
                     .into(ivPhoto, new Callback() {
                         @Override
@@ -183,6 +202,21 @@ public class TimelineAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                         @Override
                         public void onError() {
                             Log.d(TAG_LOG, "error");
+                        }
+                    });
+            */
+            Glide.with(ivPhoto.getContext())
+                    .load(photo.getMediaUrl())
+                    .placeholder(R.drawable.ic_twitter)
+                    .into(new SimpleTarget<GlideDrawable>() {
+                        @Override
+                        public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
+                            ivPhoto.setImageDrawable(resource);
+                        }
+
+                        @Override
+                        public void onLoadFailed(Exception e, Drawable errorDrawable) {
+                            Log.d(TAG_LOG, e.getMessage());
                         }
                     });
         }

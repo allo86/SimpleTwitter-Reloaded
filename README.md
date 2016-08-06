@@ -32,19 +32,21 @@ The following **optional** features are implemented:
 The following **bonus** features are implemented:
 
 * [x] User can see embedded image media within the tweet detail view
-* [ ] User can watch embedded video within the tweet
+* [x] User can watch embedded video within the tweet detail view
 * [x] Compose tweet functionality is build using modal overlay
 * [x] Use Parcelable instead of Serializable using the popular [Parceler library](http://guides.codepath.com/android/Using-Parceler).
 * [x] Apply the popular [Butterknife annotation library](http://guides.codepath.com/android/Reducing-View-Boilerplate-with-Butterknife) to reduce view boilerplate.
 * [x] [Leverage RecyclerView](http://guides.codepath.com/android/Using-the-RecyclerView) as a replacement for the ListView and ArrayAdapter for all lists of tweets.
 * [x] Move the "Compose" action to a [FloatingActionButton](https://github.com/codepath/android_guides/wiki/Floating-Action-Buttons) instead of on the AppBar.
 * [x] Replace all icon drawables and other static image assets with [vector drawables](http://guides.codepath.com/android/Drawables#vector-drawables) where appropriate.
-* [ ] Leverages the [data binding support module](http://guides.codepath.com/android/Applying-Data-Binding-for-Views) to bind data into layout templates.
-* [ ] Replace Picasso with [Glide](http://inthecheesefactory.com/blog/get-to-know-glide-recommended-by-google/en) for more efficient image rendering.
+* [x] Replace Picasso with [Glide](http://inthecheesefactory.com/blog/get-to-know-glide-recommended-by-google/en) for more efficient image rendering.
 
 The following **additional** features are implemented:
 
-* [ ] List anything else that you can get done to improve the app functionality!
+* [x] Custom GSON deserializer for some objects
+* [x] Hide toolbar on scroll
+* [x] Retweet and unretweet within the tweet detail view
+* [x] Like and unline within the tweet detail view
 
 ## Video Walkthrough
 
@@ -62,6 +64,15 @@ Describe any challenges encountered while building the app.
 
 - [Android Async HTTP](https://github.com/loopj/android-async-http) - Simple asynchronous HTTP requests with JSON parsing
 - [Picasso](http://square.github.io/picasso/) - Image loading and caching library for Android
+- [Glide](https://github.com/bumptech/glide) - An image loading and caching library for Android focused on smooth scrolling
+- [Butterknife](http://jakewharton.github.io/butterknife/) - Bind Android views and callbacks to fields and methods
+- [Icepick](https://github.com/frankiesardo/icepick) - Android Instance State made easy
+- [GSON](https://github.com/google/gson) - A Java serialization/deserialization library that can convert Java Objects into JSON and back
+- [Parceler](https://github.com/johncarl81/parceler) - Android Parcelables made easy through code generation
+- [RecyclerView Animators](https://github.com/wasabeef/recyclerview-animators) - An Android Animation library which easily add itemanimator to RecyclerView items
+- [Retrofit](http://square.github.io/retrofit/) - A type-safe HTTP client for Android and Java
+- [ActiveAndroid](http://www.activeandroid.com/) - Active record style SQLite persistence for Android
+- [VideoPlayerManager](https://github.com/danylovolokh/VideoPlayerManager) - Project designed to help controlling Android MediaPlayer class
 
 ## License
 

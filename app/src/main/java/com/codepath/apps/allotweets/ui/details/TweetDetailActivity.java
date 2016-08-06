@@ -2,6 +2,7 @@ package com.codepath.apps.allotweets.ui.details;
 
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
@@ -16,6 +17,10 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.codepath.apps.allotweets.R;
 import com.codepath.apps.allotweets.model.Media;
 import com.codepath.apps.allotweets.model.Tweet;
@@ -29,8 +34,6 @@ import com.codepath.apps.allotweets.ui.base.TextView;
 import com.codepath.apps.allotweets.ui.compose.ComposeTweetFragment;
 import com.codepath.apps.allotweets.ui.utils.DynamicHeightImageView;
 import com.codepath.apps.allotweets.ui.utils.DynamicHeightVideoPlayerView;
-import com.squareup.picasso.Callback;
-import com.squareup.picasso.Picasso;
 import com.volokh.danylo.video_player_manager.manager.PlayerItemChangeListener;
 import com.volokh.danylo.video_player_manager.manager.SingleVideoPlayerManager;
 import com.volokh.danylo.video_player_manager.manager.VideoPlayerManager;
@@ -41,7 +44,6 @@ import org.parceler.Parcels;
 import butterknife.BindView;
 import butterknife.OnClick;
 import icepick.State;
-import jp.wasabeef.picasso.transformations.RoundedCornersTransformation;
 
 public class TweetDetailActivity extends BaseActivity implements ComposeTweetFragment.OnComposeTweetFragmentListener {
 
@@ -128,12 +130,28 @@ public class TweetDetailActivity extends BaseActivity implements ComposeTweetFra
 
     @Override
     protected void showData() {
+        /*
         Picasso.with(ivAvatar.getContext())
                 .load(mTweet.getUser().getProfileImageUrl())
                 .placeholder(R.drawable.ic_twitter_gray)
                 .fit()
                 .transform(new RoundedCornersTransformation(10, 10))
                 .into(ivAvatar);
+        */
+        Glide.with(this)
+                .load(mTweet.getUser().getProfileImageUrl())
+                .placeholder(R.drawable.ic_twitter_gray)
+                .into(new SimpleTarget<GlideDrawable>() {
+                    @Override
+                    public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
+                        ivAvatar.setImageDrawable(resource);
+                    }
+
+                    @Override
+                    public void onLoadFailed(Exception e, Drawable errorDrawable) {
+                        Log.d(TAG_LOG, e.getMessage());
+                    }
+                });
 
         tvName.setText(mTweet.getUser().getName());
         tvScreenname.setText(mTweet.getUser().getScreennameForDisplay());
@@ -155,6 +173,7 @@ public class TweetDetailActivity extends BaseActivity implements ComposeTweetFra
 
             Media photo = mTweet.getPhoto();
             ivPhoto.setHeightRatio(((double) photo.getSize().getHeight()) / photo.getSize().getWidth());
+            /*
             Picasso.with(ivPhoto.getContext()).load(photo.getMediaUrl())
                     .into(ivPhoto, new Callback() {
                         @Override
@@ -165,6 +184,20 @@ public class TweetDetailActivity extends BaseActivity implements ComposeTweetFra
                         @Override
                         public void onError() {
                             Log.d(TAG_LOG, "error");
+                        }
+                    });
+            */
+            Glide.with(this).load(mTweet.getUser().getProfileImageUrl())
+                    .into(new SimpleTarget<GlideDrawable>() {
+                        @Override
+                        public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
+                            ivPhoto.setImageDrawable(resource);
+                            pbImage.setVisibility(View.GONE);
+                        }
+
+                        @Override
+                        public void onLoadFailed(Exception e, Drawable errorDrawable) {
+                            Log.d(TAG_LOG, e.getMessage());
                         }
                     });
         }
