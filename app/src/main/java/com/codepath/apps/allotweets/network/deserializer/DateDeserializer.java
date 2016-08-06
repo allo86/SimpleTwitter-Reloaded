@@ -30,7 +30,7 @@ public class DateDeserializer implements JsonDeserializer<Date> {
         try {
             return df.parse(json.getAsString());
         } catch (ParseException e) {
-            // TODO: Need to do something here?
+            // Do nothing by now
             return null;
         }
     }

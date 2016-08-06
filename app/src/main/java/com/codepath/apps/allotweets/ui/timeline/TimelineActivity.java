@@ -107,7 +107,6 @@ public class TimelineActivity extends BaseActivity implements ComposeTweetFragme
             if (Utils.isOnline()) {
                 loadTimeline(null, null);
             } else {
-                // TODO: Load SQLite
                 loadOfflineTweets();
             }
         }
