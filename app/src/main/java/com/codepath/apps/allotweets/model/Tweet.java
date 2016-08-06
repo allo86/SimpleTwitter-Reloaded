@@ -81,6 +81,10 @@ public class Tweet extends Model {
     @Expose
     Entities entities;
 
+    @SerializedName("extended_entities")
+    @Expose
+    Entities extendedEntities;
+
     public Tweet() {
         super();
     }
@@ -181,6 +185,16 @@ public class Tweet extends Model {
         this.entities = entities;
     }
 
+    public Entities getExtendedEntities() {
+        return extendedEntities;
+    }
+
+    public void setExtendedEntities(Entities extendedEntities) {
+        this.extendedEntities = extendedEntities;
+    }
+
+    /* Helpers */
+
     public String getFormattedCreatedAtDate() {
         if (getCreatedAt() != null) {
             return DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM, Locale.getDefault()).format(getCreatedAt());
@@ -191,6 +205,22 @@ public class Tweet extends Model {
     public String getRelativeTimeAgo() {
         long dateMillis = getCreatedAt().getTime();
         return DateUtils.getRelativeTimeSpanString(dateMillis, System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS).toString();
+    }
+
+    public boolean hasVideo() {
+        return extendedEntities != null && extendedEntities.hasVideo();
+    }
+
+    public boolean hasPhoto() {
+        return entities != null && entities.hasPhoto();
+    }
+
+    public Media getPhoto() {
+        return entities.getPhoto();
+    }
+
+    public Media getVideo() {
+        return extendedEntities.getVideo();
     }
 
     // Record Finders

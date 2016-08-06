@@ -224,7 +224,7 @@ public class TimelineActivity extends BaseActivity implements ComposeTweetFragme
                     // Twitter User already existe. It may have been updated
                     dbTwitterUser.setProfileImageUrl(tweet.getUser().getProfileImageUrl());
                     dbTwitterUser.setName(tweet.getUser().getName());
-                    dbTwitterUser.setScreenname(tweet.getUser().getName());
+                    dbTwitterUser.setScreenname(tweet.getUser().getScreenname());
                     dbTwitterUser.save();
                     Log.d(TAG_LOG, "user updated: " + tweet.getUser().getUserId());
                 } else {

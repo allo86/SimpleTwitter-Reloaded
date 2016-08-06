@@ -15,7 +15,7 @@ public class Size {
     @Expose
     int width;
 
-    @SerializedName("")
+    @SerializedName("h")
     @Expose
     int height;
 

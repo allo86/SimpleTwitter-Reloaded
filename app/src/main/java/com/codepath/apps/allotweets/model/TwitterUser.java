@@ -115,7 +115,7 @@ public class TwitterUser extends Model {
     }
 
     public String getScreenname() {
-        return "@" + screenname;
+        return screenname;
     }
 
     public void setScreenname(String screenname) {
@@ -224,6 +224,10 @@ public class TwitterUser extends Model {
 
     public void setFriendsCount(int friendsCount) {
         this.friendsCount = friendsCount;
+    }
+
+    public String getScreennameForDisplay() {
+        return "@" + screenname;
     }
 
     // Record Finders

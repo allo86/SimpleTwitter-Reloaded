@@ -81,12 +81,38 @@
                 android:linksClickable="true"
                 tools:text="Status Status" />
 
+            <RelativeLayout
+                android:id="@+id/photo_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tv_status"
+                android:layout_marginTop="@dimen/activity_vertical_margin_half">
+
+                <com.codepath.apps.allotweets.ui.utils.DynamicHeightImageView
+                    android:id="@+id/iv_photo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:autoLink="all"
+                    android:linksClickable="true"
+                    tools:ignore="ContentDescription"
+                    tools:text="Status Status" />
+
+                <ProgressBar
+                    android:id="@+id/pb_image"
+                    style="@android:style/Widget.ProgressBar.Small"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true" />
+
+            </RelativeLayout>
+
             <com.codepath.apps.allotweets.ui.base.TextView
                 android:id="@+id/tv_date"
                 style="@style/tweet_details_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/tv_status"
+                android:layout_below="@+id/photo_container"
                 android:layout_marginBottom="@dimen/activity_vertical_margin"
                 android:layout_marginTop="@dimen/activity_vertical_margin" />
 

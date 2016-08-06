@@ -1,14 +1,19 @@
 package com.codepath.apps.allotweets.ui.timeline;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 
 import com.codepath.apps.allotweets.R;
+import com.codepath.apps.allotweets.model.Media;
 import com.codepath.apps.allotweets.model.Tweet;
 import com.codepath.apps.allotweets.ui.base.TextView;
+import com.codepath.apps.allotweets.ui.utils.DynamicHeightImageView;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -24,7 +29,11 @@ import jp.wasabeef.picasso.transformations.RoundedCornersTransformation;
  */
 public class TimelineAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
+    public static final String TAG_LOG = TimelineAdapter.class.getCanonicalName();
+
     public static int BASE_TWEET = 1;
+    public static int PHOTO_TWEET = 2;
+    public static int VIDEO_TWEET = 3;
 
     public interface OnTimelineAdapterListener {
         void didSelectTweet(Tweet tweet);
@@ -43,6 +52,12 @@ public class TimelineAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         if (viewType == BASE_TWEET) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_timeline_tweet, parent, false);
             return new TimelineTweetViewHolder(view);
+        } else if (viewType == PHOTO_TWEET) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_timeline_photo_tweet, parent, false);
+            return new TimelineTweetPhotoViewHolder(view);
+        } else if (viewType == VIDEO_TWEET) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_timeline_video_tweet, parent, false);
+            return new TimelineTweetViewHolder(view);
         }
         return null;
     }
@@ -50,7 +65,11 @@ public class TimelineAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (holder != null) {
-            if (holder instanceof TimelineTweetViewHolder) {
+            if (holder instanceof TimelineTweetVideoViewHolder) {
+                ((TimelineTweetVideoViewHolder) holder).configureViewWithTweet(mTweets.get(position));
+            } else if (holder instanceof TimelineTweetPhotoViewHolder) {
+                ((TimelineTweetPhotoViewHolder) holder).configureViewWithTweet(mTweets.get(position));
+            } else if (holder instanceof TimelineTweetViewHolder) {
                 ((TimelineTweetViewHolder) holder).configureViewWithTweet(mTweets.get(position));
             }
         }
@@ -63,7 +82,14 @@ public class TimelineAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     @Override
     public int getItemViewType(int position) {
-        return BASE_TWEET;
+        Tweet tweet = mTweets.get(position);
+        if (tweet.hasVideo()) {
+            return VIDEO_TWEET;
+        } else if (tweet.hasPhoto()) {
+            return PHOTO_TWEET;
+        } else {
+            return BASE_TWEET;
+        }
     }
 
     public void notifyDataSetChanged(ArrayList<Tweet> tweets) {
@@ -73,7 +99,7 @@ public class TimelineAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     public class TimelineTweetViewHolder extends RecyclerView.ViewHolder {
 
-        private Tweet tweet;
+        protected Tweet tweet;
 
         @BindView(R.id.iv_avatar)
         ImageView ivAvatar;
@@ -113,9 +139,71 @@ public class TimelineAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     .into(ivAvatar);
 
             tvName.setText(tweet.getUser().getName());
-            tvUser.setText(tweet.getUser().getScreenname());
+            tvUser.setText(tweet.getUser().getScreennameForDisplay());
             tvText.setText(tweet.getText());
             tvDate.setText(tweet.getRelativeTimeAgo());
+        }
+    }
+
+    public class TimelineTweetPhotoViewHolder extends TimelineTweetViewHolder {
+
+        @BindView(R.id.iv_photo)
+        DynamicHeightImageView ivPhoto;
+
+        @BindView(R.id.pb_image)
+        ProgressBar pbImage;
+
+        public TimelineTweetPhotoViewHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (mListener != null) mListener.didSelectTweet(tweet);
+                }
+            });
+        }
+
+        public void configureViewWithTweet(Tweet tweet) {
+            super.configureViewWithTweet(tweet);
+
+            pbImage.setVisibility(View.VISIBLE);
+            ivPhoto.setImageDrawable(null);
+
+            Media photo = tweet.getPhoto();
+            ivPhoto.setHeightRatio(((double) photo.getSize().getHeight()) / photo.getSize().getWidth());
+            Picasso.with(ivPhoto.getContext()).load(photo.getMediaUrl())
+                    .into(ivPhoto, new Callback() {
+                        @Override
+                        public void onSuccess() {
+                            pbImage.setVisibility(View.GONE);
+                        }
+
+                        @Override
+                        public void onError() {
+                            Log.d(TAG_LOG, "error");
+                        }
+                    });
+        }
+    }
+
+    public class TimelineTweetVideoViewHolder extends TimelineTweetViewHolder {
+
+        public TimelineTweetVideoViewHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (mListener != null) mListener.didSelectTweet(tweet);
+                }
+            });
+        }
+
+        public void configureViewWithTweet(Tweet tweet) {
+            super.configureViewWithTweet(tweet);
         }
     }
 }

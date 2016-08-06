@@ -9,13 +9,20 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
+import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 
 import com.codepath.apps.allotweets.R;
+import com.codepath.apps.allotweets.model.Media;
 import com.codepath.apps.allotweets.model.Tweet;
 import com.codepath.apps.allotweets.ui.base.BaseActivity;
 import com.codepath.apps.allotweets.ui.base.TextView;
 import com.codepath.apps.allotweets.ui.compose.ComposeTweetFragment;
+import com.codepath.apps.allotweets.ui.utils.DynamicHeightImageView;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import org.parceler.Parcels;
@@ -58,6 +65,15 @@ public class TweetDetailActivity extends BaseActivity implements ComposeTweetFra
     @BindView(R.id.bt_favorite)
     ImageView btFavorite;
 
+    @BindView(R.id.photo_container)
+    RelativeLayout photoContainer;
+
+    @BindView(R.id.iv_photo)
+    DynamicHeightImageView ivPhoto;
+
+    @BindView(R.id.pb_image)
+    ProgressBar pbImage;
+
     private Tweet mTweet;
 
     private boolean refreshTweets;
@@ -87,9 +103,33 @@ public class TweetDetailActivity extends BaseActivity implements ComposeTweetFra
                 .into(ivAvatar);
 
         tvName.setText(mTweet.getUser().getName());
-        tvScreenname.setText(mTweet.getUser().getScreenname());
+        tvScreenname.setText(mTweet.getUser().getScreennameForDisplay());
         tvStatus.setText(mTweet.getText());
         tvDate.setText(mTweet.getFormattedCreatedAtDate());
+
+        if (mTweet.hasPhoto()) {
+            photoContainer.setVisibility(View.VISIBLE);
+
+            pbImage.setVisibility(View.VISIBLE);
+            ivPhoto.setImageDrawable(null);
+
+            Media photo = mTweet.getPhoto();
+            ivPhoto.setHeightRatio(((double) photo.getSize().getHeight()) / photo.getSize().getWidth());
+            Picasso.with(ivPhoto.getContext()).load(photo.getMediaUrl())
+                    .into(ivPhoto, new Callback() {
+                        @Override
+                        public void onSuccess() {
+                            pbImage.setVisibility(View.GONE);
+                        }
+
+                        @Override
+                        public void onError() {
+                            Log.d(TAG_LOG, "error");
+                        }
+                    });
+        } else {
+            photoContainer.setVisibility(View.GONE);
+        }
 
         Spannable spanRetweets = new SpannableString(getString(R.string.number_of_retweets, String.valueOf(mTweet.getRetweetCount())));
         spanRetweets.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this, R.color.black)),

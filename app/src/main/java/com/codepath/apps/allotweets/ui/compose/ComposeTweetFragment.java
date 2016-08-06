@@ -145,7 +145,7 @@ public class ComposeTweetFragment extends DialogFragment {
         }
 
         if (mTweet != null) {
-            tvInReply.setText(getString(R.string.in_reply_to, mTweet.getUser().getScreenname()));
+            tvInReply.setText(getString(R.string.in_reply_to, mTweet.getUser().getScreennameForDisplay()));
             tvInReply.setVisibility(View.VISIBLE);
         } else {
             tvInReply.setVisibility(View.GONE);

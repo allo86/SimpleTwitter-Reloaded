@@ -31,6 +31,10 @@ public class Media {
     @Expose
     Size size;
 
+    @SerializedName("video_info")
+    @Expose
+    VideoInfo videoInfo;
+
     public Media() {
 
     }
@@ -73,5 +77,23 @@ public class Media {
 
     public void setSize(Size size) {
         this.size = size;
+    }
+
+    public VideoInfo getVideoInfo() {
+        return videoInfo;
+    }
+
+    public void setVideoInfo(VideoInfo videoInfo) {
+        this.videoInfo = videoInfo;
+    }
+
+    /* Helpers */
+
+    public boolean isVideo() {
+        return type != null && "video".equals(type);
+    }
+
+    public boolean isPhoto() {
+        return type != null && "photo".equals(type);
     }
 }

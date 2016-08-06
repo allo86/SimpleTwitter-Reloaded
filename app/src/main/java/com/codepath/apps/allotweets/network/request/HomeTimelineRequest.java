@@ -5,7 +5,7 @@ package com.codepath.apps.allotweets.network.request;
  */
 public class HomeTimelineRequest {
 
-    private int count = 100;
+    private int count = 50;
 
     private Long sinceId;
 
