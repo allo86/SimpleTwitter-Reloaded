@@ -1,14 +1,22 @@
 package com.codepath.apps.allotweets.ui.timeline;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.MenuItem;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.codepath.apps.allotweets.R;
+import com.codepath.apps.allotweets.data.DataManager;
 import com.codepath.apps.allotweets.model.Tweet;
 import com.codepath.apps.allotweets.model.TwitterUser;
 import com.codepath.apps.allotweets.network.TwitterError;
@@ -20,6 +28,7 @@ import com.codepath.apps.allotweets.network.request.HomeTimelineRequest;
 import com.codepath.apps.allotweets.network.request.RetweetRequest;
 import com.codepath.apps.allotweets.network.utils.Utils;
 import com.codepath.apps.allotweets.ui.base.BaseActivity;
+import com.codepath.apps.allotweets.ui.base.TextView;
 import com.codepath.apps.allotweets.ui.compose.ComposeTweetFragment;
 import com.codepath.apps.allotweets.ui.details.TweetDetailActivity;
 import com.codepath.apps.allotweets.ui.utils.DividerItemDecoration;
@@ -34,14 +43,27 @@ import java.util.Comparator;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import jp.wasabeef.glide.transformations.CropCircleTransformation;
 
 public class TimelineActivity extends BaseActivity implements ComposeTweetFragment.OnComposeTweetFragmentListener {
+
+    @BindView(R.id.drawer_layout)
+    DrawerLayout mDrawerLayout;
+
+    @BindView(R.id.navigation_view)
+    NavigationView mNavigationView;
 
     @BindView(R.id.swipe_container)
     SwipeRefreshLayout mSwipeToRefresh;
 
     @BindView(R.id.rv_timeline)
     RecyclerView mRecyclerView;
+
+    // Navigation header
+    private ImageView ivAvatar;
+    private TextView tvScreenname;
+
+    private ActionBarDrawerToggle mActionBarDrawerToggle;
 
     private TimelineAdapter mAdapter;
     private ArrayList<Tweet> mTweets;
@@ -54,6 +76,9 @@ public class TimelineActivity extends BaseActivity implements ComposeTweetFragme
 
     @Override
     protected void initializeUI() {
+        // Navigation Drawer
+        setUpNavigationDrawer();
+
         mRecyclerView.setHasFixedSize(true);
 
         RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST);
@@ -120,6 +145,14 @@ public class TimelineActivity extends BaseActivity implements ComposeTweetFragme
 
     @Override
     protected void showData() {
+        // Show user info in header
+        Glide.with(this)
+                .load(DataManager.sharedInstance().getUser().getProfileImageUrl())
+                .placeholder(R.drawable.ic_twitter)
+                .bitmapTransform(new CropCircleTransformation(this))
+                .into(ivAvatar);
+        tvScreenname.setText(DataManager.sharedInstance().getUser().getScreennameForDisplay());
+
         if (mTweets != null) {
             mAdapter.notifyDataSetChanged(mTweets);
         } else {
@@ -129,6 +162,74 @@ public class TimelineActivity extends BaseActivity implements ComposeTweetFragme
                 loadOfflineTweets();
             }
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (mActionBarDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    // `onPostCreate` called when activity start-up is complete after `onStart()`
+    // NOTE! Make sure to override the method with only a single `Bundle` argument
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+
+        // Sync the toggle state after onRestoreInstanceState has occurred.
+        mActionBarDrawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        // Pass any configuration change to the drawer toggles
+        mActionBarDrawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    /**
+     * Method that sets initial configuration for Navigation Drawer
+     */
+    private void setUpNavigationDrawer() {
+        // Navigation Drawer
+        mNavigationView.setNavigationItemSelectedListener(
+                new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(MenuItem menuItem) {
+                        selectDrawerItem(menuItem);
+                        return true;
+                    }
+                });
+
+        // Hamburguer icon
+        mActionBarDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close);
+        mDrawerLayout.addDrawerListener(mActionBarDrawerToggle);
+
+        // Navigation View Header
+        ivAvatar = (ImageView) mNavigationView.getHeaderView(0).findViewById(R.id.iv_avatar);
+        tvScreenname = (TextView) mNavigationView.getHeaderView(0).findViewById(R.id.tv_screename);
+    }
+
+    /**
+     * Navigation to selected drawer item
+     *
+     * @param menuItem
+     */
+    private void selectDrawerItem(MenuItem menuItem) {
+        switch (menuItem.getItemId()) {
+            case R.id.nav_profile:
+                Toast.makeText(this, "profile", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.nav_help:
+                Toast.makeText(this, "help", Toast.LENGTH_SHORT).show();
+                break;
+            default:
+                break;
+        }
+
     }
 
     private void loadTimeline(Long sinceId, Long maxId) {

@@ -11,6 +11,10 @@
     <string name="login_label">Log in</string>
     <string name="loading_user_profile">Retrieving user profile &#8230;</string>
 
+    <!-- Navigation drawer -->
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+
     <!-- Home Timeline -->
     <string name="loading_more_tweets">Loading more tweets &#8230;</string>
     <string name="loading_offline_tweets">There seems to be no internet connection available. You will see the last storaged tweets</string>
@@ -23,6 +27,12 @@
     <string name="number_of_retweets">%1$s RETWEETS</string>
     <string name="number_of_likes">%1$s LIKES</string>
     <string name="share_title">Share Tweet with &#8230;</string>
+
+    <!-- Profile -->
+    <string name="profile">Profile</string>
+
+    <!-- Help -->
+    <string name="help">Help</string>
 
     <!-- Errors -->
     <string name="error_no_internet">There seems to be no internet connection available. You can\'t perform this action.</string>
