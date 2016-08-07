@@ -1,4 +1,4 @@
-# Project 3 - ALLOTweetsApp
+# Project 4 - ALLOTweetsApp
 
 **ALLOTweetsApp** is an android app that allows a user to view home and mentions timelines, view user profiles with user timelines, as well as compose and post a new tweet. The app utilizes [Twitter REST API](https://dev.twitter.com/rest/public).
 
