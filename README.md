@@ -2,7 +2,7 @@
 
 **ALLOTweetsApp** is an android app that allows a user to view his Twitter timeline and post a new tweet. The app utilizes [Twitter REST API](https://dev.twitter.com/rest/public).
 
-Time spent: **21** hours spent in total
+Time spent: **24** hours spent in total
 
 ## User Stories
 
@@ -45,14 +45,17 @@ The following **additional** features are implemented:
 
 * [x] Custom GSON deserializer for some objects
 * [x] Hide toolbar on scroll
-* [x] Retweet and unretweet within the tweet detail view
-* [x] Like and unline within the tweet detail view
+* [x] Retweet and unretweet within the tweet detail view and the timeline
+* [x] Like and unline within the tweet detail view and the timeline
+* [x] Reply tweet within the detail view
 
 ## Video Walkthrough
 
 Here's a walkthrough of implemented user stories:
 
-<img src='http://i.imgur.com/link/to/your/gif/file.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+<img src='http://i.imgur.com/TKIDTwy.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+
+<img src='http://i.imgur.com/K16TvB6.gif' title='Offline' width='' alt='Offline' />
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
 

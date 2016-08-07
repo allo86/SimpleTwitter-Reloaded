@@ -25,6 +25,7 @@
     <string name="share_title">Share Tweet with &#8230;</string>
 
     <!-- Errors -->
+    <string name="error_no_internet">There seems to be no internet connection available. You can\'t perform this action.</string>
     <string name="error_retweet">There was an error with your \"retweet\" request. Please try again.</string>
     <string name="error_favorite">There was an error with your \"like tweet\" request. Please try again.</string>
 

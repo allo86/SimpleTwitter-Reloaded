@@ -187,7 +187,7 @@ public class TweetDetailActivity extends BaseActivity implements ComposeTweetFra
                         }
                     });
             */
-            Glide.with(this).load(mTweet.getUser().getProfileImageUrl())
+            Glide.with(this).load(photo.getMediaUrl())
                     .into(new SimpleTarget<GlideDrawable>() {
                         @Override
                         public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
@@ -212,14 +212,16 @@ public class TweetDetailActivity extends BaseActivity implements ComposeTweetFra
 
         btRetweet.setImageResource(mTweet.isRetweeted() ? R.drawable.ic_retweet_done : R.drawable.ic_retweet);
 
-        Spannable spanRetweets = new SpannableString(getString(R.string.number_of_retweets, String.valueOf(mTweet.getRetweetCount())));
+        int retweetCount = mTweet.getRetweetedStatus() != null ? mTweet.getRetweetedStatus().getRetweetCount() : mTweet.getRetweetCount();
+
+        Spannable spanRetweets = new SpannableString(getString(R.string.number_of_retweets, String.valueOf(retweetCount)));
         spanRetweets.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this, R.color.black)),
                 0,
-                String.valueOf(mTweet.getRetweetCount()).length(),
+                String.valueOf(retweetCount).length(),
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         spanRetweets.setSpan(new StyleSpan(Typeface.BOLD),
                 0,
-                String.valueOf(mTweet.getRetweetCount()).length(),
+                String.valueOf(retweetCount).length(),
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         tvRetweets.setText(spanRetweets);
     }
@@ -230,14 +232,16 @@ public class TweetDetailActivity extends BaseActivity implements ComposeTweetFra
 
         btFavorite.setImageResource(mTweet.isFavorite() ? R.drawable.ic_favorite_done : R.drawable.ic_favorite);
 
-        Spannable spanLikes = new SpannableString(getString(R.string.number_of_likes, String.valueOf(mTweet.getFavoriteCount())));
+        int favoriteCount = mTweet.getRetweetedStatus() != null ? mTweet.getRetweetedStatus().getFavoriteCount() : mTweet.getFavoriteCount();
+
+        Spannable spanLikes = new SpannableString(getString(R.string.number_of_likes, String.valueOf(favoriteCount)));
         spanLikes.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this, R.color.black)),
                 0,
-                String.valueOf(mTweet.getFavoriteCount()).length(),
+                String.valueOf(favoriteCount).length(),
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         spanLikes.setSpan(new StyleSpan(Typeface.BOLD),
                 0,
-                String.valueOf(mTweet.getFavoriteCount()).length(),
+                String.valueOf(favoriteCount).length(),
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         tvLikes.setText(spanLikes);
     }
@@ -258,7 +262,7 @@ public class TweetDetailActivity extends BaseActivity implements ComposeTweetFra
         if (mTweet.isRetweeted()) {
             // Undo retweet
             request.setUndo(true);
-            request.setTweetId(mTweet.getRetweetedStatus().getTweetId());
+            request.setTweetId(mTweet.getRetweetedStatus() != null ? mTweet.getRetweetedStatus().getTweetId() : mTweet.getTweetId());
         } else {
             // Retweet
             request.setUndo(false);
@@ -268,15 +272,22 @@ public class TweetDetailActivity extends BaseActivity implements ComposeTweetFra
         mTwitterClient.retweet(request, new RetweetCallback() {
             @Override
             public void onSuccess(Tweet retweet) {
+                // Weird bug ... this request does not return the favorites information
+                // Fix
+                int favoriteCount = mTweet.getRetweetedStatus() != null ? mTweet.getRetweetedStatus().getFavoriteCount() : mTweet.getFavoriteCount();
+
                 if (request.isUndo()) {
                     mTweet.setRetweetCount(mTweet.getRetweetCount() - 1);
-                    mTweet.setRetweetedStatus(null);
+                    mTweet.setRetweetedStatus(retweet);
                     mTweet.setRetweeted(false);
                 } else {
                     mTweet.setRetweetCount(mTweet.getRetweetCount() + 1);
                     mTweet.setRetweetedStatus(retweet);
                     mTweet.setRetweeted(true);
                 }
+                mTweet.setFavoriteCount(favoriteCount);
+                if (mTweet.getRetweetedStatus() != null)
+                    mTweet.getRetweetedStatus().setFavoriteCount(favoriteCount);
                 updateRetweet();
             }
 
@@ -293,7 +304,7 @@ public class TweetDetailActivity extends BaseActivity implements ComposeTweetFra
         btFavorite.setVisibility(View.INVISIBLE);
         pbFavorite.setVisibility(View.VISIBLE);
 
-        FavoriteTweetRequest request = new FavoriteTweetRequest(mTweet.getTweetId(),
+        final FavoriteTweetRequest request = new FavoriteTweetRequest(mTweet.getTweetId(),
                 mTweet.isFavorite());
         mTwitterClient.markAsFavorite(request, new FavoriteTweetCallback() {
             @Override

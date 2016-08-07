@@ -9,6 +9,10 @@ public class FavoriteTweetRequest {
 
     private boolean undo;
 
+    public FavoriteTweetRequest() {
+
+    }
+
     public FavoriteTweetRequest(Long tweetId, boolean undo) {
         this.tweetId = tweetId;
         this.undo = undo;

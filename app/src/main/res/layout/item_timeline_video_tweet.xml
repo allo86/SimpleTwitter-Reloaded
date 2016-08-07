@@ -68,4 +68,13 @@
         android:layout_toRightOf="@+id/iv_avatar"
         tools:text="10 min ago" />
 
+    <include
+        layout="@layout/layout_item_timeline_actions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_date"
+        android:layout_marginTop="@dimen/activity_vertical_margin_half"
+        android:layout_toEndOf="@+id/iv_avatar"
+        android:layout_toRightOf="@+id/iv_avatar" />
+
 </RelativeLayout>

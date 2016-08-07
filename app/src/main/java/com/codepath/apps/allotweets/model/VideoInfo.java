@@ -13,7 +13,7 @@ import java.util.ArrayList;
 @Parcel
 public class VideoInfo {
 
-    @SerializedName("aspect_Ratio")
+    @SerializedName("aspect_ratio")
     @Expose
     ArrayList<Integer> aspectRatio;
 

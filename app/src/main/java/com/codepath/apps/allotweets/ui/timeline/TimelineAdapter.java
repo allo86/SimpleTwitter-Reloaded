@@ -39,6 +39,12 @@ public class TimelineAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     public interface OnTimelineAdapterListener {
         void didSelectTweet(Tweet tweet);
+
+        void didSelectReplyTweet(Tweet tweet);
+
+        void didSelectRetweet(Tweet tweet);
+
+        void didSelectMarkAsFavorite(Tweet tweet);
     }
 
     private ArrayList<Tweet> mTweets;
@@ -118,6 +124,21 @@ public class TimelineAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         @BindView(R.id.tv_date)
         TextView tvDate;
 
+        @BindView(R.id.bt_reply)
+        ImageView btReply;
+
+        @BindView(R.id.tv_retweet)
+        TextView tvRetweet;
+
+        @BindView(R.id.pb_retweet)
+        ProgressBar pbRetweet;
+
+        @BindView(R.id.tv_favorite)
+        TextView tvFavorite;
+
+        @BindView(R.id.pb_favorite)
+        ProgressBar pbFavorite;
+
         public TimelineTweetViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
@@ -126,6 +147,31 @@ public class TimelineAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 @Override
                 public void onClick(View view) {
                     if (mListener != null) mListener.didSelectTweet(tweet);
+                }
+            });
+
+            btReply.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (mListener != null) mListener.didSelectReplyTweet(tweet);
+                }
+            });
+
+            tvRetweet.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    pbRetweet.setVisibility(View.VISIBLE);
+                    tvRetweet.setVisibility(View.GONE);
+                    if (mListener != null) mListener.didSelectRetweet(tweet);
+                }
+            });
+
+            tvFavorite.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    pbFavorite.setVisibility(View.VISIBLE);
+                    tvFavorite.setVisibility(View.GONE);
+                    if (mListener != null) mListener.didSelectMarkAsFavorite(tweet);
                 }
             });
         }
@@ -160,6 +206,63 @@ public class TimelineAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             tvUser.setText(tweet.getUser().getScreennameForDisplay());
             tvText.setText(tweet.getText());
             tvDate.setText(tweet.getRelativeTimeAgo());
+
+            int resourceRetweet = R.drawable.ic_retweet;
+            if (tweet.getRetweetedStatus() != null) {
+                if (tweet.getRetweetedStatus().isRetweeted()) {
+                    resourceRetweet = R.drawable.ic_retweet_done;
+                }
+            } else {
+                if (tweet.isRetweeted()) {
+                    resourceRetweet = R.drawable.ic_retweet_done;
+                }
+            }
+            tvRetweet.setCompoundDrawablesWithIntrinsicBounds(tvRetweet.getContext().getResources().getDrawable(resourceRetweet),
+                    null, null, null);
+
+            int favoriteRetweet = tweet.isFavorite() ? R.drawable.ic_favorite_done : R.drawable.ic_favorite;
+            tvFavorite.setCompoundDrawablesWithIntrinsicBounds(tvFavorite.getContext().getResources().getDrawable(favoriteRetweet),
+                    null, null, null);
+
+            pbRetweet.setVisibility(View.GONE);
+            tvRetweet.setVisibility(View.VISIBLE);
+            tvRetweet.setText(String.valueOf(tweet.getRetweetedStatus() != null ? tweet.getRetweetedStatus().getRetweetCount() : tweet.getRetweetCount()));
+
+            pbFavorite.setVisibility(View.GONE);
+            tvFavorite.setVisibility(View.VISIBLE);
+            tvFavorite.setText(String.valueOf(tweet.getRetweetedStatus() != null ? tweet.getRetweetedStatus().getFavoriteCount() : tweet.getFavoriteCount()));
+
+            updateRetweet();
+            updateFavorite();
+        }
+
+        private void updateRetweet() {
+            int resourceRetweet = R.drawable.ic_retweet;
+            if (tweet.getRetweetedStatus() != null) {
+                if (tweet.getRetweetedStatus().isRetweeted()) {
+                    resourceRetweet = R.drawable.ic_retweet_done;
+                }
+            } else {
+                if (tweet.isRetweeted()) {
+                    resourceRetweet = R.drawable.ic_retweet_done;
+                }
+            }
+            tvRetweet.setCompoundDrawablesWithIntrinsicBounds(tvRetweet.getContext().getResources().getDrawable(resourceRetweet),
+                    null, null, null);
+
+            pbRetweet.setVisibility(View.GONE);
+            tvRetweet.setVisibility(View.VISIBLE);
+            tvRetweet.setText(String.valueOf(tweet.getRetweetedStatus() != null ? tweet.getRetweetedStatus().getRetweetCount() : tweet.getRetweetCount()));
+        }
+
+        private void updateFavorite() {
+            int favoriteRetweet = tweet.isFavorite() ? R.drawable.ic_favorite_done : R.drawable.ic_favorite;
+            tvFavorite.setCompoundDrawablesWithIntrinsicBounds(tvFavorite.getContext().getResources().getDrawable(favoriteRetweet),
+                    null, null, null);
+
+            pbFavorite.setVisibility(View.GONE);
+            tvFavorite.setVisibility(View.VISIBLE);
+            tvFavorite.setText(String.valueOf(tweet.getRetweetedStatus() != null ? tweet.getRetweetedStatus().getFavoriteCount() : tweet.getFavoriteCount()));
         }
     }
 
@@ -212,6 +315,7 @@ public class TimelineAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                         @Override
                         public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
                             ivPhoto.setImageDrawable(resource);
+                            pbImage.setVisibility(View.GONE);
                         }
 
                         @Override

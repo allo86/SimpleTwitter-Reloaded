@@ -12,8 +12,12 @@ import com.codepath.apps.allotweets.R;
 import com.codepath.apps.allotweets.model.Tweet;
 import com.codepath.apps.allotweets.model.TwitterUser;
 import com.codepath.apps.allotweets.network.TwitterError;
+import com.codepath.apps.allotweets.network.callbacks.FavoriteTweetCallback;
 import com.codepath.apps.allotweets.network.callbacks.HomeTimelineCallback;
+import com.codepath.apps.allotweets.network.callbacks.RetweetCallback;
+import com.codepath.apps.allotweets.network.request.FavoriteTweetRequest;
 import com.codepath.apps.allotweets.network.request.HomeTimelineRequest;
+import com.codepath.apps.allotweets.network.request.RetweetRequest;
 import com.codepath.apps.allotweets.network.utils.Utils;
 import com.codepath.apps.allotweets.ui.base.BaseActivity;
 import com.codepath.apps.allotweets.ui.compose.ComposeTweetFragment;
@@ -73,6 +77,21 @@ public class TimelineActivity extends BaseActivity implements ComposeTweetFragme
             @Override
             public void didSelectTweet(Tweet tweet) {
                 goToTweetDetails(tweet);
+            }
+
+            @Override
+            public void didSelectReplyTweet(Tweet tweet) {
+                replyTweet(tweet);
+            }
+
+            @Override
+            public void didSelectRetweet(Tweet tweet) {
+                retweet(tweet);
+            }
+
+            @Override
+            public void didSelectMarkAsFavorite(Tweet tweet) {
+                markAsFavorite(tweet);
             }
         });
         mRecyclerView.setAdapter(mAdapter);
@@ -196,13 +215,8 @@ public class TimelineActivity extends BaseActivity implements ComposeTweetFragme
             // Make sure the request was successful
             if (resultCode == RESULT_OK) {
                 Tweet tweet = Parcels.unwrap(data.getExtras().getParcelable(TweetDetailActivity.TWEET));
-                if (mTweets != null) {
-                    if (mTweets.indexOf(tweet) != -1) {
-                        int index = mTweets.indexOf(tweet);
-                        mTweets.set(index, tweet);
-                        mAdapter.notifyItemChanged(index);
-                    }
-                }
+                updateTweetInAdapter(tweet);
+
                 boolean refreshTweets = data.getExtras().getBoolean(TweetDetailActivity.REFRESH_TWEETS);
                 if (refreshTweets) {
                     loadTimeline(null, null);
@@ -216,6 +230,98 @@ public class TimelineActivity extends BaseActivity implements ComposeTweetFragme
         FragmentManager fm = getSupportFragmentManager();
         ComposeTweetFragment editNameDialogFragment = ComposeTweetFragment.newInstance();
         editNameDialogFragment.show(fm, "compose_tweet");
+    }
+
+    private void replyTweet(Tweet tweet) {
+        if (Utils.isOnline()) {
+            FragmentManager fm = getSupportFragmentManager();
+            ComposeTweetFragment editNameDialogFragment = ComposeTweetFragment.newInstance(tweet);
+            editNameDialogFragment.show(fm, "compose_tweet");
+        } else {
+            Toast.makeText(TimelineActivity.this, getString(R.string.error_no_internet), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void retweet(final Tweet tweet) {
+        final RetweetRequest request = new RetweetRequest();
+        if (tweet.isRetweeted()) {
+            // Undo retweet
+            request.setUndo(true);
+            request.setTweetId(tweet.getRetweetedStatus() != null ? tweet.getRetweetedStatus().getTweetId() : tweet.getTweetId());
+        } else {
+            // Retweet
+            request.setUndo(false);
+            request.setTweetId(tweet.getTweetId());
+        }
+
+        mTwitterClient.retweet(request, new RetweetCallback() {
+            @Override
+            public void onSuccess(Tweet retweet) {
+                // Weird bug ... this request does not return the favorites information
+                // Fix
+                int favoriteCount = tweet.getRetweetedStatus() != null ? tweet.getRetweetedStatus().getFavoriteCount() : tweet.getFavoriteCount();
+
+                if (request.isUndo()) {
+                    tweet.setRetweetCount(tweet.getRetweetCount() - 1);
+                    tweet.setRetweetedStatus(null);
+                    tweet.setRetweeted(false);
+                } else {
+                    tweet.setRetweetCount(tweet.getRetweetCount() + 1);
+                    tweet.setRetweetedStatus(retweet);
+                    tweet.setRetweeted(true);
+                }
+                tweet.setFavoriteCount(favoriteCount);
+                if (tweet.getRetweetedStatus() != null)
+                    tweet.getRetweetedStatus().setFavoriteCount(favoriteCount);
+                updateTweetInAdapter(tweet);
+            }
+
+            @Override
+            public void onError(TwitterError error) {
+                Toast.makeText(TimelineActivity.this, R.string.error_retweet, Toast.LENGTH_SHORT).show();
+                updateTweetInAdapter(tweet);
+            }
+        });
+    }
+
+    private void markAsFavorite(final Tweet tweet) {
+        final FavoriteTweetRequest request = new FavoriteTweetRequest(tweet.getTweetId(), tweet.isFavorite());
+
+        mTwitterClient.markAsFavorite(request, new FavoriteTweetCallback() {
+            @Override
+            public void onSuccess(Tweet retweet) {
+                tweet.setFavorite(retweet.isFavorite());
+                tweet.setFavoriteCount(retweet.getFavoriteCount());
+                if (tweet.getRetweetedStatus() != null) {
+                    tweet.getRetweetedStatus().setFavoriteCount(tweet.getFavoriteCount());
+                }
+                updateTweetInAdapter(retweet);
+                /*
+                if (tweet.getRetweetedStatus() != null) {
+                    tweet.setRetweetedStatus(retweet);
+                    updateTweetInAdapter(tweet);
+                } else {
+                    updateTweetInAdapter(retweet);
+                }
+                */
+            }
+
+            @Override
+            public void onError(TwitterError error) {
+                Toast.makeText(TimelineActivity.this, R.string.error_favorite, Toast.LENGTH_LONG).show();
+                updateTweetInAdapter(tweet);
+            }
+        });
+    }
+
+    private void updateTweetInAdapter(Tweet tweet) {
+        if (mTweets != null) {
+            if (mTweets.indexOf(tweet) != -1) {
+                int index = mTweets.indexOf(tweet);
+                mTweets.set(index, tweet);
+                mAdapter.notifyItemChanged(index);
+            }
+        }
     }
 
     @Override
