@@ -8,7 +8,7 @@ import java.util.ArrayList;
 /**
  * Created by ALLO on 1/8/16.
  */
-public interface HomeTimelineCallback {
+public interface TimelineCallback {
 
     void onSuccess(ArrayList<Tweet> tweets);
 

@@ -2,6 +2,7 @@ package com.codepath.apps.allotweets.ui.login;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatButton;
 import android.view.Menu;
@@ -15,8 +16,9 @@ import com.codepath.apps.allotweets.network.TwitterClient;
 import com.codepath.apps.allotweets.network.TwitterError;
 import com.codepath.apps.allotweets.network.callbacks.AuthenticatedUserProfileCallback;
 import com.codepath.apps.allotweets.network.utils.Utils;
-import com.codepath.apps.allotweets.ui.timeline.TimelineActivity;
+import com.codepath.apps.allotweets.ui.main.MainActivity;
 import com.codepath.oauth.OAuthLoginActionBarActivity;
+import com.google.gson.Gson;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -67,17 +69,24 @@ public class LoginActivity extends OAuthLoginActionBarActivity<TwitterClient> {
             twitterClient.getAuthenticatedUserProfile(new AuthenticatedUserProfileCallback() {
                 @Override
                 public void onSuccess(TwitterUser user) {
+                    // Save user in SharedPreferences
+                    saveUserInPrefs(user);
+
                     DataManager.sharedInstance().setUser(user);
-                    goToTimeline();
+                    goToMainActivity();
                 }
 
                 @Override
                 public void onError(TwitterError error) {
                     Toast.makeText(LoginActivity.this, error.getMessage(), Toast.LENGTH_LONG).show();
+                    DataManager.sharedInstance().setUser(getUserFromPrefs());
+                    goToMainActivity();
                 }
             });
         } else {
-            goToTimeline();
+            // Get profile from shared preferences
+            DataManager.sharedInstance().setUser(getUserFromPrefs());
+            goToMainActivity();
         }
     }
 
@@ -95,8 +104,8 @@ public class LoginActivity extends OAuthLoginActionBarActivity<TwitterClient> {
         getClient().connect();
     }
 
-    private void goToTimeline() {
-        Intent i = new Intent(this, TimelineActivity.class);
+    private void goToMainActivity() {
+        Intent i = new Intent(this, MainActivity.class);
         i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(i);
 
@@ -105,6 +114,22 @@ public class LoginActivity extends OAuthLoginActionBarActivity<TwitterClient> {
         }
 
         finish();
+    }
+
+    private void saveUserInPrefs(TwitterUser user) {
+        SharedPreferences mPrefs = getPreferences(MODE_PRIVATE);
+        SharedPreferences.Editor prefsEditor = mPrefs.edit();
+        Gson gson = Utils.getGson();
+        String json = gson.toJson(user);
+        prefsEditor.putString("user", json);
+        prefsEditor.apply();
+    }
+
+    private TwitterUser getUserFromPrefs() {
+        SharedPreferences mPrefs = getPreferences(MODE_PRIVATE);
+        Gson gson = Utils.getGson();
+        String json = mPrefs.getString("user", "");
+        return gson.fromJson(json, TwitterUser.class);
     }
 
 }

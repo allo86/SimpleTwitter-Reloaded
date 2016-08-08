@@ -16,8 +16,12 @@
     <string name="drawer_close">Close navigation drawer</string>
 
     <!-- Home Timeline -->
+    <string name="home_timeline">Home</string>
     <string name="loading_more_tweets">Loading more tweets &#8230;</string>
     <string name="loading_offline_tweets">There seems to be no internet connection available. You will see the last storaged tweets</string>
+
+    <!-- Mentions -->
+    <string name="mentions">Mentions</string>
 
     <!-- Compose Tweet -->
     <string name="tweet">Tweet</string>
@@ -30,6 +34,11 @@
 
     <!-- Profile -->
     <string name="profile">Profile</string>
+    <string name="number_of_following">%1$s FOLLOWING</string>
+    <string name="number_of_followers">%1$s FOLLOWERS</string>
+    <string name="tab_tweets">Tweets</string>
+    <string name="tab_media">Media</string>
+    <string name="tab_likes">Likes</string>
 
     <!-- Help -->
     <string name="help">Help</string>
@@ -38,5 +47,8 @@
     <string name="error_no_internet">There seems to be no internet connection available. You can\'t perform this action.</string>
     <string name="error_retweet">There was an error with your \"retweet\" request. Please try again.</string>
     <string name="error_favorite">There was an error with your \"like tweet\" request. Please try again.</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

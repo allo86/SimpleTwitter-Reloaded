@@ -1,0 +1,1 @@
+ALTER TABLE users ADD profile_background_image_url TEXT;

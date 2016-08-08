@@ -1,6 +1,5 @@
 package com.codepath.apps.allotweets.ui.compose;
 
-import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -62,9 +61,7 @@ public class ComposeTweetFragment extends DialogFragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnComposeTweetFragmentListener {
-
         void onStatusUpdated(Tweet tweet);
-
     }
 
     private OnComposeTweetFragmentListener mListener;
@@ -98,14 +95,18 @@ public class ComposeTweetFragment extends DialogFragment {
         // Required empty public constructor
     }
 
-    public static ComposeTweetFragment newInstance() {
-        return new ComposeTweetFragment();
+    public static ComposeTweetFragment newInstance(OnComposeTweetFragmentListener listener) {
+        ComposeTweetFragment fragment = new ComposeTweetFragment();
+        fragment.mListener = listener;
+        return fragment;
     }
 
-    public static ComposeTweetFragment newInstance(Tweet tweet) {
+    public static ComposeTweetFragment newInstance(OnComposeTweetFragmentListener listener, Tweet tweet) {
         ComposeTweetFragment fragment = new ComposeTweetFragment();
+        fragment.mListener = listener;
         Bundle args = new Bundle();
         args.putParcelable(TWEET, Parcels.wrap(tweet));
+        fragment.setArguments(args);
         return fragment;
     }
 
@@ -171,17 +172,6 @@ public class ComposeTweetFragment extends DialogFragment {
             tvInReply.setVisibility(View.VISIBLE);
         } else {
             tvInReply.setVisibility(View.GONE);
-        }
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnComposeTweetFragmentListener) {
-            mListener = (OnComposeTweetFragmentListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnComposeTweetFragmentListener");
         }
     }
 

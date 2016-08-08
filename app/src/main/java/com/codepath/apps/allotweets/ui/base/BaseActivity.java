@@ -17,6 +17,8 @@ import butterknife.ButterKnife;
 import icepick.Icepick;
 
 /**
+ * Base Activity
+ * <p/>
  * Created by ALLO on 1/8/16.
  */
 public abstract class BaseActivity extends AppCompatActivity {
@@ -33,8 +35,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(getLayoutResourceID());
 
-        initializeUI();
-
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             initializeDataFromIntentBundle(extras);
@@ -43,6 +43,8 @@ public abstract class BaseActivity extends AppCompatActivity {
         Icepick.restoreInstanceState(this, savedInstanceState);
 
         mTwitterClient = TwitterApplication.getRestClient();
+
+        initializeUI();
 
         showData();
     }
@@ -89,26 +91,30 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     protected abstract void showData();
 
-    protected void turnOffToolbarScrolling() {
+    public void turnOffToolbarScrolling() {
         if (toolbar != null && appBarLayout != null) {
-            AppBarLayout.LayoutParams toolbarLayoutParams = (AppBarLayout.LayoutParams) toolbar.getLayoutParams();
-            toolbarLayoutParams.setScrollFlags(0);
-            toolbar.setLayoutParams(toolbarLayoutParams);
-            CoordinatorLayout.LayoutParams appBarLayoutParams = (CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams();
-            appBarLayoutParams.setBehavior(null);
-            appBarLayout.setLayoutParams(appBarLayoutParams);
+            if (toolbar.getLayoutParams() instanceof AppBarLayout.LayoutParams) {
+                AppBarLayout.LayoutParams toolbarLayoutParams = (AppBarLayout.LayoutParams) toolbar.getLayoutParams();
+                toolbarLayoutParams.setScrollFlags(0);
+                toolbar.setLayoutParams(toolbarLayoutParams);
+                CoordinatorLayout.LayoutParams appBarLayoutParams = (CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams();
+                appBarLayoutParams.setBehavior(null);
+                appBarLayout.setLayoutParams(appBarLayoutParams);
+            }
         }
     }
 
-    protected void turnOnToolbarScrolling() {
+    public void turnOnToolbarScrolling() {
         if (toolbar != null && appBarLayout != null) {
-            AppBarLayout.LayoutParams toolbarLayoutParams = (AppBarLayout.LayoutParams) toolbar.getLayoutParams();
-            if (toolbarLayoutParams.getScrollFlags() != (AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL | AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS)) {
-                toolbarLayoutParams.setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL | AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS);
-                toolbar.setLayoutParams(toolbarLayoutParams);
-                CoordinatorLayout.LayoutParams appBarLayoutParams = (CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams();
-                appBarLayoutParams.setBehavior(new AppBarLayout.Behavior());
-                appBarLayout.setLayoutParams(appBarLayoutParams);
+            if (toolbar.getLayoutParams() instanceof AppBarLayout.LayoutParams) {
+                AppBarLayout.LayoutParams toolbarLayoutParams = (AppBarLayout.LayoutParams) toolbar.getLayoutParams();
+                if (toolbarLayoutParams.getScrollFlags() != (AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL | AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS)) {
+                    toolbarLayoutParams.setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL | AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS);
+                    toolbar.setLayoutParams(toolbarLayoutParams);
+                    CoordinatorLayout.LayoutParams appBarLayoutParams = (CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams();
+                    appBarLayoutParams.setBehavior(new AppBarLayout.Behavior());
+                    appBarLayout.setLayoutParams(appBarLayoutParams);
+                }
             }
         }
     }

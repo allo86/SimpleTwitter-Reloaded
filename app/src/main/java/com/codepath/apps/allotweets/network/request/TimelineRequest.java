@@ -3,7 +3,7 @@ package com.codepath.apps.allotweets.network.request;
 /**
  * Created by ALLO on 1/8/16.
  */
-public class HomeTimelineRequest {
+public class TimelineRequest {
 
     private int count = 50;
 
@@ -11,7 +11,9 @@ public class HomeTimelineRequest {
 
     private Long maxId;
 
-    public HomeTimelineRequest() {
+    private Long userId;
+
+    public TimelineRequest() {
 
     }
 
@@ -37,5 +39,13 @@ public class HomeTimelineRequest {
 
     public void setMaxId(Long maxId) {
         this.maxId = maxId;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 }

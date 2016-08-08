@@ -61,6 +61,16 @@ public class TwitterUser extends Model {
     @Column(name = "profile_image_url")
     String profileImageUrl;
 
+    @SerializedName("profile_background_image_url")
+    @Expose
+    @Column(name = "profile_background_image_url")
+    String profileBackgroundImageUrl;
+
+    @SerializedName("profile_banner_url")
+    @Expose
+    @Column(name = "profile_banner_url")
+    String profileBannerUrl;
+
     @SerializedName("created_at")
     @Expose
     Date createdAt;
@@ -87,7 +97,18 @@ public class TwitterUser extends Model {
 
     @SerializedName("friends_count")
     @Expose
+    @Column(name = "friends_count")
     int friendsCount;
+
+    @SerializedName("followers_count")
+    @Expose
+    @Column(name = "followers_count")
+    int followersCount;
+
+    @SerializedName("statuses_count")
+    @Expose
+    @Column(name = "statuses_count")
+    int statusesCount;
 
     // Used to return tweets from another table based on the foreign key
     public List<Tweet> tweets() {
@@ -170,6 +191,22 @@ public class TwitterUser extends Model {
         this.profileImageUrl = profileImageUrl;
     }
 
+    public String getProfileBackgroundImageUrl() {
+        return profileBackgroundImageUrl;
+    }
+
+    public void setProfileBackgroundImageUrl(String profileBackgroundImageUrl) {
+        this.profileBackgroundImageUrl = profileBackgroundImageUrl;
+    }
+
+    public String getProfileBannerUrl() {
+        return profileBannerUrl;
+    }
+
+    public void setProfileBannerUrl(String profileBannerUrl) {
+        this.profileBannerUrl = profileBannerUrl;
+    }
+
     public Date getCreatedAt() {
         return createdAt;
     }
@@ -226,12 +263,43 @@ public class TwitterUser extends Model {
         this.friendsCount = friendsCount;
     }
 
+    public int getFollowersCount() {
+        return followersCount;
+    }
+
+    public void setFollowersCount(int followersCount) {
+        this.followersCount = followersCount;
+    }
+
+    public int getStatusesCount() {
+        return statusesCount;
+    }
+
+    public void setStatusesCount(int statusesCount) {
+        this.statusesCount = statusesCount;
+    }
+
+    /* Utils */
+
     public String getScreennameForDisplay() {
         return "@" + screenname;
+    }
+
+    public boolean hasProfileBackgroundImage() {
+        return profileBackgroundImageUrl != null && !"".equals(profileBackgroundImageUrl);
     }
 
     // Record Finders
     public static TwitterUser byUserId(Long userId) {
         return new Select().from(TwitterUser.class).where("user_id = ?", userId).executeSingle();
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (object != null && object instanceof TwitterUser) {
+            TwitterUser user = (TwitterUser) object;
+            return this.getUserId().equals(user.getUserId());
+        }
+        return false;
     }
 }

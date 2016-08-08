@@ -2,23 +2,20 @@ package com.codepath.apps.allotweets.network;
 
 import android.content.Context;
 
-import com.codepath.apps.allotweets.model.Size;
 import com.codepath.apps.allotweets.model.Tweet;
 import com.codepath.apps.allotweets.model.TwitterUser;
 import com.codepath.apps.allotweets.network.callbacks.AuthenticatedUserProfileCallback;
 import com.codepath.apps.allotweets.network.callbacks.FavoriteTweetCallback;
-import com.codepath.apps.allotweets.network.callbacks.HomeTimelineCallback;
 import com.codepath.apps.allotweets.network.callbacks.PostTweetCallback;
 import com.codepath.apps.allotweets.network.callbacks.RetweetCallback;
-import com.codepath.apps.allotweets.network.deserializer.DateDeserializer;
-import com.codepath.apps.allotweets.network.deserializer.SizeDeserializer;
+import com.codepath.apps.allotweets.network.callbacks.TimelineCallback;
 import com.codepath.apps.allotweets.network.request.FavoriteTweetRequest;
-import com.codepath.apps.allotweets.network.request.HomeTimelineRequest;
 import com.codepath.apps.allotweets.network.request.RetweetRequest;
+import com.codepath.apps.allotweets.network.request.TimelineRequest;
 import com.codepath.apps.allotweets.network.request.TweetRequest;
+import com.codepath.apps.allotweets.network.utils.Utils;
 import com.codepath.oauth.OAuthBaseClient;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.loopj.android.http.RequestParams;
 import com.loopj.android.http.TextHttpResponseHandler;
@@ -26,9 +23,7 @@ import com.loopj.android.http.TextHttpResponseHandler;
 import org.scribe.builder.api.Api;
 import org.scribe.builder.api.TwitterApi;
 
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Date;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -79,13 +74,38 @@ public class TwitterClient extends OAuthBaseClient {
 	 */
 
     /**
+     * Authenticated user profile
+     *
+     * @param callback Callback
+     */
+    public void getAuthenticatedUserProfile(final AuthenticatedUserProfileCallback callback) {
+        String apiUrl = getApiUrl("account/verify_credentials.json");
+
+        RequestParams params = new RequestParams();
+
+        client.get(apiUrl, params, new TextHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                Gson gson = Utils.getGson();
+                TwitterUser user = gson.fromJson(responseString, TwitterUser.class);
+                callback.onSuccess(user);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                callback.onError(new TwitterError(throwable != null ? throwable.getMessage() : null));
+            }
+        });
+    }
+
+    /**
      * Home Timeline
      *
      * @param request  Request
      * @param callback Callback
      */
-    public void getHomeTimeline(HomeTimelineRequest request,
-                                final HomeTimelineCallback callback) {
+    public void getHomeTimeline(TimelineRequest request,
+                                final TimelineCallback callback) {
         String apiUrl = getApiUrl("statuses/home_timeline.json");
 
         RequestParams params = new RequestParams();
@@ -102,7 +122,7 @@ public class TwitterClient extends OAuthBaseClient {
         client.get(apiUrl, params, new TextHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, String responseString) {
-                Gson gson = getGson();
+                Gson gson = Utils.getGson();
                 ArrayList<Tweet> tweets = gson.fromJson(responseString,
                         new TypeToken<ArrayList<Tweet>>() {
                         }.getType());
@@ -117,21 +137,113 @@ public class TwitterClient extends OAuthBaseClient {
     }
 
     /**
-     * Authenticated user profile
+     * Mentions Timeline
      *
+     * @param request  Request
      * @param callback Callback
      */
-    public void getAuthenticatedUserProfile(final AuthenticatedUserProfileCallback callback) {
-        String apiUrl = getApiUrl("account/verify_credentials.json");
+    public void getMentionsTimeline(TimelineRequest request,
+                                    final TimelineCallback callback) {
+        String apiUrl = getApiUrl("statuses/mentions_timeline.json");
 
         RequestParams params = new RequestParams();
+        if (request != null) {
+            if (request.getSinceId() != null) {
+                params.put("since_id", request.getSinceId());
+            }
+            if (request.getMaxId() != null) {
+                params.put("max_id", request.getMaxId());
+            }
+        }
 
         client.get(apiUrl, params, new TextHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, String responseString) {
-                Gson gson = getGson();
-                TwitterUser user = gson.fromJson(responseString, TwitterUser.class);
-                callback.onSuccess(user);
+                Gson gson = Utils.getGson();
+                ArrayList<Tweet> tweets = gson.fromJson(responseString,
+                        new TypeToken<ArrayList<Tweet>>() {
+                        }.getType());
+                callback.onSuccess(tweets);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                callback.onError(new TwitterError(throwable != null ? throwable.getMessage() : null));
+            }
+        });
+    }
+
+    /**
+     * User Timeline
+     *
+     * @param request  Request
+     * @param callback Callback
+     */
+    public void getUserTimeline(TimelineRequest request,
+                                final TimelineCallback callback) {
+        String apiUrl = getApiUrl("statuses/user_timeline.json");
+
+        RequestParams params = new RequestParams();
+        if (request != null) {
+            if (request.getSinceId() != null) {
+                params.put("since_id", request.getSinceId());
+            }
+            if (request.getMaxId() != null) {
+                params.put("max_id", request.getMaxId());
+            }
+            if (request.getUserId() != null) {
+                params.put("user_id", request.getUserId());
+            }
+        }
+
+        client.get(apiUrl, params, new TextHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                Gson gson = Utils.getGson();
+                ArrayList<Tweet> tweets = gson.fromJson(responseString,
+                        new TypeToken<ArrayList<Tweet>>() {
+                        }.getType());
+                callback.onSuccess(tweets);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                callback.onError(new TwitterError(throwable != null ? throwable.getMessage() : null));
+            }
+        });
+    }
+
+    /**
+     * Favorites Timeline
+     *
+     * @param request  Request
+     * @param callback Callback
+     */
+    public void getFavoritesTimeline(TimelineRequest request,
+                                     final TimelineCallback callback) {
+        String apiUrl = getApiUrl("favorites/list.json");
+
+        RequestParams params = new RequestParams();
+        if (request != null) {
+            if (request.getSinceId() != null) {
+                params.put("since_id", request.getSinceId());
+            }
+            if (request.getMaxId() != null) {
+                params.put("max_id", request.getMaxId());
+            }
+            if (request.getUserId() != null) {
+                params.put("user_id", request.getUserId());
+            }
+        }
+
+        client.get(apiUrl, params, new TextHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                Gson gson = Utils.getGson();
+                ArrayList<Tweet> tweets = gson.fromJson(responseString,
+                        new TypeToken<ArrayList<Tweet>>() {
+                        }.getType());
+                callback.onSuccess(tweets);
             }
 
             @Override
@@ -170,7 +282,7 @@ public class TwitterClient extends OAuthBaseClient {
         client.post(apiUrl, params, new TextHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, String responseString) {
-                Gson gson = getGson();
+                Gson gson = Utils.getGson();
                 Tweet tweet = gson.fromJson(responseString, Tweet.class);
                 callback.onSuccess(tweet);
             }
@@ -203,7 +315,7 @@ public class TwitterClient extends OAuthBaseClient {
         client.post(apiUrl, params, new TextHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, String responseString) {
-                Gson gson = getGson();
+                Gson gson = Utils.getGson();
                 Tweet tweet = gson.fromJson(responseString, Tweet.class);
                 callback.onSuccess(tweet);
             }
@@ -236,7 +348,7 @@ public class TwitterClient extends OAuthBaseClient {
         client.post(apiUrl, params, new TextHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, String responseString) {
-                Gson gson = getGson();
+                Gson gson = Utils.getGson();
                 Tweet tweet = gson.fromJson(responseString, Tweet.class);
                 callback.onSuccess(tweet);
             }
@@ -246,14 +358,5 @@ public class TwitterClient extends OAuthBaseClient {
                 callback.onError(new TwitterError(throwable != null ? throwable.getMessage() : null));
             }
         });
-    }
-
-    private Gson getGson() {
-        return new GsonBuilder()
-                .excludeFieldsWithModifiers(Modifier.FINAL, Modifier.TRANSIENT, Modifier.STATIC)
-                .excludeFieldsWithoutExposeAnnotation()
-                .registerTypeAdapter(Date.class, new DateDeserializer())
-                .registerTypeAdapter(Size.class, new SizeDeserializer())
-                .create();
     }
 }

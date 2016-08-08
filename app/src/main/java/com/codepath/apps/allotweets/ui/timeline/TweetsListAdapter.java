@@ -16,6 +16,7 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import com.codepath.apps.allotweets.R;
 import com.codepath.apps.allotweets.model.Media;
 import com.codepath.apps.allotweets.model.Tweet;
+import com.codepath.apps.allotweets.model.TwitterUser;
 import com.codepath.apps.allotweets.ui.base.TextView;
 import com.codepath.apps.allotweets.ui.utils.DynamicHeightImageView;
 
@@ -25,13 +26,13 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
- * TimelineAdapter
+ * Tweets List Adapter
  * <p/>
  * Created by ALLO on 1/8/16.
  */
-public class TimelineAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class TweetsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    public static final String TAG_LOG = TimelineAdapter.class.getCanonicalName();
+    public static final String TAG_LOG = TweetsListAdapter.class.getCanonicalName();
 
     public static int BASE_TWEET = 1;
     public static int PHOTO_TWEET = 2;
@@ -45,12 +46,14 @@ public class TimelineAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         void didSelectRetweet(Tweet tweet);
 
         void didSelectMarkAsFavorite(Tweet tweet);
+
+        void didSelectUser(TwitterUser user);
     }
 
     private ArrayList<Tweet> mTweets;
     private OnTimelineAdapterListener mListener;
 
-    public TimelineAdapter(ArrayList<Tweet> tweets, OnTimelineAdapterListener listener) {
+    public TweetsListAdapter(ArrayList<Tweet> tweets, OnTimelineAdapterListener listener) {
         this.mTweets = tweets;
         this.mListener = listener;
     }
@@ -58,13 +61,13 @@ public class TimelineAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == BASE_TWEET) {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_timeline_tweet, parent, false);
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_tweet_list, parent, false);
             return new TimelineTweetViewHolder(view);
         } else if (viewType == PHOTO_TWEET) {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_timeline_photo_tweet, parent, false);
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_photo_tweet_list, parent, false);
             return new TimelineTweetPhotoViewHolder(view);
         } else if (viewType == VIDEO_TWEET) {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_timeline_video_tweet, parent, false);
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_video_tweet_list, parent, false);
             return new TimelineTweetViewHolder(view);
         }
         return null;
@@ -172,6 +175,13 @@ public class TimelineAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     pbFavorite.setVisibility(View.VISIBLE);
                     tvFavorite.setVisibility(View.GONE);
                     if (mListener != null) mListener.didSelectMarkAsFavorite(tweet);
+                }
+            });
+
+            ivAvatar.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (mListener != null) mListener.didSelectUser(tweet.getUser());
                 }
             });
         }

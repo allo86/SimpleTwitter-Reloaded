@@ -249,7 +249,7 @@ public class TweetDetailActivity extends BaseActivity implements ComposeTweetFra
     @OnClick(R.id.bt_reply)
     public void reply() {
         FragmentManager fm = getSupportFragmentManager();
-        ComposeTweetFragment editNameDialogFragment = ComposeTweetFragment.newInstance(mTweet);
+        ComposeTweetFragment editNameDialogFragment = ComposeTweetFragment.newInstance(this, mTweet);
         editNameDialogFragment.show(fm, "compose_tweet");
     }
 

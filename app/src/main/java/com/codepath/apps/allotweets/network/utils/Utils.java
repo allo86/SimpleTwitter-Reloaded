@@ -4,7 +4,15 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
+import com.codepath.apps.allotweets.model.Size;
+import com.codepath.apps.allotweets.network.deserializer.DateDeserializer;
+import com.codepath.apps.allotweets.network.deserializer.SizeDeserializer;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import java.io.IOException;
+import java.lang.reflect.Modifier;
+import java.util.Date;
 
 /**
  * Created by ALLO on 6/8/16.
@@ -30,5 +38,14 @@ public class Utils {
             e.printStackTrace();
         }
         return false;
+    }
+
+    public static Gson getGson() {
+        return new GsonBuilder()
+                .excludeFieldsWithModifiers(Modifier.FINAL, Modifier.TRANSIENT, Modifier.STATIC)
+                .excludeFieldsWithoutExposeAnnotation()
+                .registerTypeAdapter(Date.class, new DateDeserializer())
+                .registerTypeAdapter(Size.class, new SizeDeserializer())
+                .create();
     }
 }
