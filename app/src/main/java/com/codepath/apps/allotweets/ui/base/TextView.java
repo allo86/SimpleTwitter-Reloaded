@@ -23,7 +23,7 @@ public class TextView extends android.widget.TextView {
         init();
     }
 
-    private void init() {
+    protected void init() {
 
     }
 }

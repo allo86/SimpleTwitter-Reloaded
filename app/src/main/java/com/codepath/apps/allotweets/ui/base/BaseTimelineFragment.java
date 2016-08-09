@@ -11,6 +11,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.codepath.apps.allotweets.R;
+import com.codepath.apps.allotweets.model.Hashtag;
 import com.codepath.apps.allotweets.model.Tweet;
 import com.codepath.apps.allotweets.model.TwitterUser;
 import com.codepath.apps.allotweets.network.TwitterError;
@@ -22,6 +23,7 @@ import com.codepath.apps.allotweets.network.utils.Utils;
 import com.codepath.apps.allotweets.ui.compose.ComposeTweetFragment;
 import com.codepath.apps.allotweets.ui.details.TweetDetailActivity;
 import com.codepath.apps.allotweets.ui.profile.ProfileActivity;
+import com.codepath.apps.allotweets.ui.search.SearchActivity;
 import com.codepath.apps.allotweets.ui.timeline.TweetsListAdapter;
 import com.codepath.apps.allotweets.ui.utils.DividerItemDecoration;
 import com.codepath.apps.allotweets.ui.utils.EndlessRecyclerViewScrollListener;
@@ -128,6 +130,11 @@ public abstract class BaseTimelineFragment extends BaseFragment implements Compo
             @Override
             public void didSelectUser(TwitterUser user) {
                 goToProfile(user);
+            }
+
+            @Override
+            public void didSelectHashtag(Hashtag hashtag) {
+                goToHashtag(hashtag);
             }
         });
         mRecyclerView.setAdapter(mAdapter);
@@ -319,6 +326,12 @@ public abstract class BaseTimelineFragment extends BaseFragment implements Compo
         }
         Intent intent = new Intent(getActivity(), ProfileActivity.class);
         intent.putExtra(ProfileActivity.TWITTER_USER, Parcels.wrap(user));
+        startActivity(intent);
+    }
+
+    private void goToHashtag(Hashtag hashtag) {
+        Intent intent = new Intent(getActivity(), SearchActivity.class);
+        intent.putExtra(SearchActivity.QUERY, hashtag.getTextForDisplay());
         startActivity(intent);
     }
 

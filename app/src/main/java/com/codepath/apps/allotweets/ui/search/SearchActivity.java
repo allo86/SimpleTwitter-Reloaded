@@ -18,6 +18,8 @@ import icepick.State;
  */
 public class SearchActivity extends BaseActivity {
 
+    public static final String QUERY = "QUERY";
+
     private SearchView searchView;
     private MenuItem progressItem;
 
@@ -39,7 +41,14 @@ public class SearchActivity extends BaseActivity {
 
     @Override
     protected void initializeDataFromIntentBundle(Bundle extras) {
+        if (extras.containsKey(QUERY)) {
+            mTextFilter = extras.getString(QUERY);
 
+            // If filter is present, do not request focus for search view
+            mFirstLoad = true;
+            setTitle(mTextFilter);
+            startNewSearch();
+        }
     }
 
     @Override

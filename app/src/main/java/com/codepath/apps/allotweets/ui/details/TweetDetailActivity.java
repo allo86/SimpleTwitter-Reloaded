@@ -22,8 +22,10 @@ import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.codepath.apps.allotweets.R;
+import com.codepath.apps.allotweets.model.Hashtag;
 import com.codepath.apps.allotweets.model.Media;
 import com.codepath.apps.allotweets.model.Tweet;
+import com.codepath.apps.allotweets.model.TwitterUser;
 import com.codepath.apps.allotweets.network.TwitterError;
 import com.codepath.apps.allotweets.network.callbacks.FavoriteTweetCallback;
 import com.codepath.apps.allotweets.network.callbacks.RetweetCallback;
@@ -33,14 +35,18 @@ import com.codepath.apps.allotweets.ui.base.BaseActivity;
 import com.codepath.apps.allotweets.ui.base.TextView;
 import com.codepath.apps.allotweets.ui.compose.ComposeTweetFragment;
 import com.codepath.apps.allotweets.ui.profile.ProfileActivity;
+import com.codepath.apps.allotweets.ui.search.SearchActivity;
 import com.codepath.apps.allotweets.ui.utils.DynamicHeightImageView;
 import com.codepath.apps.allotweets.ui.utils.DynamicHeightVideoPlayerView;
+import com.codepath.apps.allotweets.ui.utils.PatternEditableBuilder;
 import com.volokh.danylo.video_player_manager.manager.PlayerItemChangeListener;
 import com.volokh.danylo.video_player_manager.manager.SingleVideoPlayerManager;
 import com.volokh.danylo.video_player_manager.manager.VideoPlayerManager;
 import com.volokh.danylo.video_player_manager.meta.MetaData;
 
 import org.parceler.Parcels;
+
+import java.util.regex.Pattern;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -158,6 +164,33 @@ public class TweetDetailActivity extends BaseActivity implements ComposeTweetFra
         tvScreenname.setText(mTweet.getUser().getScreennameForDisplay());
         tvStatus.setText(mTweet.getText());
         tvDate.setText(mTweet.getFormattedCreatedAtDate());
+
+        new PatternEditableBuilder().
+                addPattern(Pattern.compile("\\@(\\w+)"), ContextCompat.getColor(tvStatus.getContext(), R.color.colorPrimary),
+                        new PatternEditableBuilder.SpannableClickedListener() {
+                            @Override
+                            public void onSpanClicked(String text) {
+                                String screename = text.substring(1);
+                                for (TwitterUser twitterUser : mTweet.getEntities().getUserMentions()) {
+                                    if (twitterUser.getScreenname().equals(screename)) {
+                                        goToProfile(twitterUser);
+                                    }
+                                }
+                            }
+                        }).into(tvStatus);
+        new PatternEditableBuilder().
+                addPattern(Pattern.compile("\\#(\\w+)"), ContextCompat.getColor(tvStatus.getContext(), R.color.colorPrimary),
+                        new PatternEditableBuilder.SpannableClickedListener() {
+                            @Override
+                            public void onSpanClicked(String text) {
+                                String sHashtag = text.substring(1);
+                                for (Hashtag hashtag : mTweet.getEntities().getHashtags()) {
+                                    if (hashtag.getText().equals(sHashtag)) {
+                                        goToSearch(hashtag);
+                                    }
+                                }
+                            }
+                        }).into(tvStatus);
 
         photoContainer.setVisibility(View.GONE);
         videoContainer.setVisibility(View.GONE);
@@ -324,8 +357,18 @@ public class TweetDetailActivity extends BaseActivity implements ComposeTweetFra
 
     @OnClick(R.id.iv_avatar)
     public void goToProfile() {
+        goToProfile(mTweet.getUser());
+    }
+
+    private void goToProfile(TwitterUser twitterUser) {
         Intent intent = new Intent(this, ProfileActivity.class);
-        intent.putExtra(ProfileActivity.TWITTER_USER, Parcels.wrap(mTweet.getUser()));
+        intent.putExtra(ProfileActivity.TWITTER_USER, Parcels.wrap(twitterUser));
+        startActivity(intent);
+    }
+
+    private void goToSearch(Hashtag hashtag) {
+        Intent intent = new Intent(this, SearchActivity.class);
+        intent.putExtra(SearchActivity.QUERY, hashtag.getTextForDisplay());
         startActivity(intent);
     }
 

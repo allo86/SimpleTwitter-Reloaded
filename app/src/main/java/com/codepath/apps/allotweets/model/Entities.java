@@ -17,6 +17,14 @@ public class Entities {
     @Expose
     ArrayList<Media> media;
 
+    @SerializedName("user_mentions")
+    @Expose
+    ArrayList<TwitterUser> userMentions;
+
+    @SerializedName("hashtags")
+    @Expose
+    ArrayList<Hashtag> hashtags;
+
     public Entities() {
 
     }
@@ -28,6 +36,24 @@ public class Entities {
     public void setMedia(ArrayList<Media> media) {
         this.media = media;
     }
+
+    public ArrayList<TwitterUser> getUserMentions() {
+        return userMentions;
+    }
+
+    public void setUserMentions(ArrayList<TwitterUser> userMentions) {
+        this.userMentions = userMentions;
+    }
+
+    public ArrayList<Hashtag> getHashtags() {
+        return hashtags;
+    }
+
+    public void setHashtags(ArrayList<Hashtag> hashtags) {
+        this.hashtags = hashtags;
+    }
+
+    /* Helpers */
 
     public boolean hasVideo() {
         if (media != null && media.size() > 0) {

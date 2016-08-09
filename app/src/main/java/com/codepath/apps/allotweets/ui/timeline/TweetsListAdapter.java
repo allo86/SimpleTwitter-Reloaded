@@ -1,6 +1,7 @@
 package com.codepath.apps.allotweets.ui.timeline;
 
 import android.graphics.drawable.Drawable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,13 +15,16 @@ import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.codepath.apps.allotweets.R;
+import com.codepath.apps.allotweets.model.Hashtag;
 import com.codepath.apps.allotweets.model.Media;
 import com.codepath.apps.allotweets.model.Tweet;
 import com.codepath.apps.allotweets.model.TwitterUser;
 import com.codepath.apps.allotweets.ui.base.TextView;
 import com.codepath.apps.allotweets.ui.utils.DynamicHeightImageView;
+import com.codepath.apps.allotweets.ui.utils.PatternEditableBuilder;
 
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -48,6 +52,8 @@ public class TweetsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         void didSelectMarkAsFavorite(Tweet tweet);
 
         void didSelectUser(TwitterUser user);
+
+        void didSelectHashtag(Hashtag hashtag);
     }
 
     private ArrayList<Tweet> mTweets;
@@ -186,7 +192,7 @@ public class TweetsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             });
         }
 
-        public void configureViewWithTweet(Tweet tweet) {
+        public void configureViewWithTweet(final Tweet tweet) {
             this.tweet = tweet;
 
             /*
@@ -244,6 +250,36 @@ public class TweetsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
             updateRetweet();
             updateFavorite();
+
+            // Style clickable spans based on pattern
+            new PatternEditableBuilder().
+                    addPattern(Pattern.compile("\\@(\\w+)"), ContextCompat.getColor(tvText.getContext(), R.color.colorPrimary),
+                            new PatternEditableBuilder.SpannableClickedListener() {
+                                @Override
+                                public void onSpanClicked(String text) {
+                                    String screename = text.substring(1);
+                                    for (TwitterUser twitterUser : tweet.getEntities().getUserMentions()) {
+                                        if (twitterUser.getScreenname().equals(screename)) {
+                                            if (mListener != null)
+                                                mListener.didSelectUser(twitterUser);
+                                        }
+                                    }
+                                }
+                            }).into(tvText);
+            new PatternEditableBuilder().
+                    addPattern(Pattern.compile("\\#(\\w+)"), ContextCompat.getColor(tvText.getContext(), R.color.colorPrimary),
+                            new PatternEditableBuilder.SpannableClickedListener() {
+                                @Override
+                                public void onSpanClicked(String text) {
+                                    String sHashtag = text.substring(1);
+                                    for (Hashtag hashtag : tweet.getEntities().getHashtags()) {
+                                        if (hashtag.getText().equals(sHashtag)) {
+                                            if (mListener != null)
+                                                mListener.didSelectHashtag(hashtag);
+                                        }
+                                    }
+                                }
+                            }).into(tvText);
         }
 
         private void updateRetweet() {
