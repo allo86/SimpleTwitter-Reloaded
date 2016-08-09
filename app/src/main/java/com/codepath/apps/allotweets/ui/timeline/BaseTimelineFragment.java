@@ -39,7 +39,7 @@ import butterknife.BindView;
 /**
  * A simple {@link Fragment} subclass.
  */
-public abstract class BaseListFragment extends BaseFragment implements ComposeTweetFragment.OnComposeTweetFragmentListener {
+public abstract class BaseTimelineFragment extends BaseFragment implements ComposeTweetFragment.OnComposeTweetFragmentListener {
 
     public static final String TWITTER_USER = "TWITTER_USER";
 
@@ -193,48 +193,6 @@ public abstract class BaseListFragment extends BaseFragment implements ComposeTw
     protected void saveTweets(ArrayList<Tweet> tweets) {
         if (tweets != null && tweets.size() > 0) {
             for (Tweet tweet : tweets) {
-                /*
-                // Twitter User
-                TwitterUser dbTwitterUser = TwitterUser.byUserId(tweet.getUser().getUserId());
-                if (dbTwitterUser != null) {
-                    // Twitter User already existe. It may have been updated
-                    dbTwitterUser.setName(tweet.getUser().getName());
-                    dbTwitterUser.setScreenname(tweet.getUser().getScreenname());
-                    dbTwitterUser.setDescription(tweet.getUser().getScreenname());
-                    dbTwitterUser.setUrl(tweet.getUser().getUrl());
-                    dbTwitterUser.setProfileImageUrl(tweet.getUser().getProfileImageUrl());
-                    dbTwitterUser.setProfileBackgroundImageUrl(tweet.getUser().getProfileBackgroundImageUrl());
-                    dbTwitterUser.setProfileBannerUrl(tweet.getUser().getProfileBannerUrl());
-                    dbTwitterUser.setFriendsCount(tweet.getUser().getFriendsCount());
-                    dbTwitterUser.setFollowersCount(tweet.getUser().getFollowersCount());
-                    dbTwitterUser.setStatusesCount(tweet.getUser().getStatusesCount());
-                    dbTwitterUser.save();
-                    Log.d(TAG_LOG, "user updated: " + tweet.getUser().getUserId());
-                } else {
-                    // New Twitter User. Insert new record
-                    dbTwitterUser = tweet.getUser();
-                    dbTwitterUser.save();
-                    Log.d(TAG_LOG, "user inserted: " + tweet.getUser().getUserId());
-                }
-                tweet.setUser(dbTwitterUser);
-
-                // Tweet
-                Tweet dbTweet = Tweet.byTweetId(tweet.getTweetId());
-                if (dbTweet != null) {
-                    // Tweet already existed. It may have been updated
-                    dbTweet.setText(tweet.getText());
-                    dbTweet.setCreatedAt(tweet.getCreatedAt());
-                    dbTweet.setFavorite(tweet.isFavorite());
-                    dbTweet.setRetweeted(tweet.isRetweeted());
-                    dbTweet.save();
-                    Log.d(TAG_LOG, "tweet updated: " + tweet.getTweetId());
-                } else {
-                    // New Tweet. Insert new record
-                    dbTweet = tweet;
-                    dbTweet.save();
-                    Log.d(TAG_LOG, "tweet inserted: " + tweet.getTweetId());
-                }
-                */
                 tweet.save();
             }
         }

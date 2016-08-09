@@ -55,6 +55,9 @@
         <activity
             android:name=".ui.profile.ProfileActivity"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".ui.profile.UsersActivity"
+            android:theme="@style/AppTheme.NoActionBar.Main" />
     </application>
 
 </manifest>

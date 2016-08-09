@@ -19,12 +19,12 @@ import java.util.ArrayList;
  * <p/>
  * Created by ALLO on 7/8/16.
  */
-public class UserTimelineFragment extends BaseListFragment {
+public class UserTimelineFragment extends BaseTimelineFragment {
 
     public static UserTimelineFragment newInstance(TwitterUser user) {
         UserTimelineFragment fragment = new UserTimelineFragment();
         Bundle args = new Bundle();
-        args.putParcelable(BaseListFragment.TWITTER_USER, Parcels.wrap(user));
+        args.putParcelable(BaseTimelineFragment.TWITTER_USER, Parcels.wrap(user));
         fragment.setArguments(args);
         return fragment;
     }
@@ -64,6 +64,6 @@ public class UserTimelineFragment extends BaseListFragment {
 
     @Override
     protected void initializeDataFromArguments(Bundle args) {
-        mUser = Parcels.unwrap(args.getParcelable(BaseListFragment.TWITTER_USER));
+        mUser = Parcels.unwrap(args.getParcelable(BaseTimelineFragment.TWITTER_USER));
     }
 }

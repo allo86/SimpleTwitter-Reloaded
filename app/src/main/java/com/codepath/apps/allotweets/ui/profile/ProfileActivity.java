@@ -1,5 +1,6 @@
 package com.codepath.apps.allotweets.ui.profile;
 
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
@@ -20,6 +21,7 @@ import com.codepath.apps.allotweets.ui.base.TextView;
 import org.parceler.Parcels;
 
 import butterknife.BindView;
+import butterknife.OnClick;
 import icepick.State;
 
 /**
@@ -126,6 +128,22 @@ public class ProfileActivity extends BaseActivity {
                 String.valueOf(count).length(),
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         return span;
+    }
+
+    @OnClick(R.id.tv_following)
+    public void goToFollowing() {
+        Intent intent = new Intent(this, UsersActivity.class);
+        intent.putExtra(UsersActivity.MODE, UsersActivity.Mode.FOLLOWING);
+        intent.putExtra(UsersActivity.TWITTER_USER, Parcels.wrap(mUser));
+        startActivity(intent);
+    }
+
+    @OnClick(R.id.tv_followers)
+    public void goToFollowers() {
+        Intent intent = new Intent(this, UsersActivity.class);
+        intent.putExtra(UsersActivity.MODE, UsersActivity.Mode.FOLLOWERS);
+        intent.putExtra(UsersActivity.TWITTER_USER, Parcels.wrap(mUser));
+        startActivity(intent);
     }
 
     public TwitterUser getUser() {

@@ -16,7 +16,7 @@ import java.util.ArrayList;
  * <p/>
  * Created by ALLO on 7/8/16.
  */
-public class HomeTimelineFragment extends BaseListFragment {
+public class HomeTimelineFragment extends BaseTimelineFragment {
 
     @Override
     protected void loadTweets(Long sinceTweetId, Long maxTweetId) {

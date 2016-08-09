@@ -9,10 +9,13 @@ import com.codepath.apps.allotweets.network.callbacks.FavoriteTweetCallback;
 import com.codepath.apps.allotweets.network.callbacks.PostTweetCallback;
 import com.codepath.apps.allotweets.network.callbacks.RetweetCallback;
 import com.codepath.apps.allotweets.network.callbacks.TimelineCallback;
+import com.codepath.apps.allotweets.network.callbacks.TwitterUsersCallback;
 import com.codepath.apps.allotweets.network.request.FavoriteTweetRequest;
 import com.codepath.apps.allotweets.network.request.RetweetRequest;
 import com.codepath.apps.allotweets.network.request.TimelineRequest;
 import com.codepath.apps.allotweets.network.request.TweetRequest;
+import com.codepath.apps.allotweets.network.request.TwitterUsersRequest;
+import com.codepath.apps.allotweets.network.response.TwitterUsersResponse;
 import com.codepath.apps.allotweets.network.utils.Utils;
 import com.codepath.oauth.OAuthBaseClient;
 import com.google.gson.Gson;
@@ -351,6 +354,72 @@ public class TwitterClient extends OAuthBaseClient {
                 Gson gson = Utils.getGson();
                 Tweet tweet = gson.fromJson(responseString, Tweet.class);
                 callback.onSuccess(tweet);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                callback.onError(new TwitterError(throwable != null ? throwable.getMessage() : null));
+            }
+        });
+    }
+
+    /**
+     * Get user's friends (following)
+     *
+     * @param request  Request
+     * @param callback Callback
+     */
+    public void getFollowing(TwitterUsersRequest request,
+                             final TwitterUsersCallback callback) {
+        String apiUrl = getApiUrl("friends/list.json");
+
+        RequestParams params = new RequestParams();
+        if (request != null) {
+            if (request.getUserId() != null) {
+                params.put("user_id", request.getUserId());
+            }
+            if (request.getCursor() != null) {
+                params.put("cursor", request.getCursor());
+            }
+        }
+
+        client.get(apiUrl, params, new TextHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                callback.onSuccess(Utils.getGson().fromJson(responseString, TwitterUsersResponse.class));
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                callback.onError(new TwitterError(throwable != null ? throwable.getMessage() : null));
+            }
+        });
+    }
+
+    /**
+     * Get user's followers
+     *
+     * @param request  Request
+     * @param callback Callback
+     */
+    public void getFollowers(TwitterUsersRequest request,
+                             final TwitterUsersCallback callback) {
+        String apiUrl = getApiUrl("followers/list.json");
+
+        RequestParams params = new RequestParams();
+        if (request != null) {
+            if (request.getUserId() != null) {
+                params.put("user_id", request.getUserId());
+            }
+            if (request.getCursor() != null) {
+                params.put("cursor", request.getCursor());
+            }
+        }
+
+        client.get(apiUrl, params, new TextHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                callback.onSuccess(Utils.getGson().fromJson(responseString, TwitterUsersResponse.class));
             }
 
             @Override

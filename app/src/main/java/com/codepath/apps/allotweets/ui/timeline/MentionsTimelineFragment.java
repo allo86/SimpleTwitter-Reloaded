@@ -16,7 +16,7 @@ import java.util.ArrayList;
  * <p/>
  * Created by ALLO on 7/8/16.
  */
-public class MentionsTimelineFragment extends BaseListFragment {
+public class MentionsTimelineFragment extends BaseTimelineFragment {
     @Override
     protected void loadTweets(Long sinceTweetId, Long maxTweetId) {
         Toast.makeText(getActivity(), R.string.loading_more_tweets, Toast.LENGTH_SHORT).show();
