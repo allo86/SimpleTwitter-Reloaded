@@ -132,4 +132,14 @@
     </style>
     <!-- Details -->
 
+    <!-- Profile -->
+    <style name="profile_description">
+        <item name="android:textSize">@dimen/profile_description_font_size</item>
+    </style>
+
+    <style name="profile_following_followers">
+        <item name="android:textSize">@dimen/profile_following_followers_font_size</item>
+    </style>
+    <!-- Profile -->
+
 </resources>

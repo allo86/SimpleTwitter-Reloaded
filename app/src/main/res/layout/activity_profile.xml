@@ -58,12 +58,15 @@
 
                 <com.codepath.apps.allotweets.ui.base.TextView
                     android:id="@+id/tv_description"
+                    style="@style/profile_description"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:autoLink="phone|web"
                     tools:text="Description" />
 
                 <com.codepath.apps.allotweets.ui.base.TextView
                     android:id="@+id/tv_following"
+                    style="@style/profile_following_followers"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentBottom="true"
@@ -72,6 +75,7 @@
 
                 <com.codepath.apps.allotweets.ui.base.TextView
                     android:id="@+id/tv_followers"
+                    style="@style/profile_following_followers"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentBottom="true"

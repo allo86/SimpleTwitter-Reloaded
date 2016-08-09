@@ -10,6 +10,7 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
+import android.view.View;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
@@ -91,7 +92,12 @@ public class ProfileActivity extends BaseActivity {
                 .placeholder(R.drawable.ic_twitter)
                 .into(ivAvatar);
 
-        tvDescription.setText(mUser.getDescription());
+        if (mUser.getDescription() != null && !"".equals(mUser.getDescription())) {
+            tvDescription.setVisibility(View.VISIBLE);
+            tvDescription.setText(mUser.getDescription());
+        } else {
+            tvDescription.setVisibility(View.GONE);
+        }
 
         tvFollowing.setText(getSpannableForCount(mUser.getFriendsCount(), R.string.number_of_following));
         tvFollowers.setText(getSpannableForCount(mUser.getFollowersCount(), R.string.number_of_followers));

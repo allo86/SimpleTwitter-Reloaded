@@ -29,4 +29,8 @@
     <dimen name="tweet_details_status_font_size">18sp</dimen>
     <dimen name="tweet_details_date_font_size">16sp</dimen>
 
+    <!-- Profile -->
+    <dimen name="profile_description_font_size">16sp</dimen>
+    <dimen name="profile_following_followers_font_size">14sp</dimen>
+
 </resources>
