@@ -32,6 +32,7 @@ import com.codepath.apps.allotweets.network.request.RetweetRequest;
 import com.codepath.apps.allotweets.ui.base.BaseActivity;
 import com.codepath.apps.allotweets.ui.base.TextView;
 import com.codepath.apps.allotweets.ui.compose.ComposeTweetFragment;
+import com.codepath.apps.allotweets.ui.profile.ProfileActivity;
 import com.codepath.apps.allotweets.ui.utils.DynamicHeightImageView;
 import com.codepath.apps.allotweets.ui.utils.DynamicHeightVideoPlayerView;
 import com.volokh.danylo.video_player_manager.manager.PlayerItemChangeListener;
@@ -319,6 +320,13 @@ public class TweetDetailActivity extends BaseActivity implements ComposeTweetFra
                 updateFavorite();
             }
         });
+    }
+
+    @OnClick(R.id.iv_avatar)
+    public void goToProfile() {
+        Intent intent = new Intent(this, ProfileActivity.class);
+        intent.putExtra(ProfileActivity.TWITTER_USER, Parcels.wrap(mTweet.getUser()));
+        startActivity(intent);
     }
 
     @OnClick(R.id.fab_share)

@@ -19,6 +19,7 @@ import com.codepath.apps.allotweets.network.response.TwitterUsersResponse;
 import com.codepath.apps.allotweets.network.utils.Utils;
 import com.codepath.oauth.OAuthBaseClient;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.loopj.android.http.RequestParams;
 import com.loopj.android.http.TextHttpResponseHandler;
@@ -244,6 +245,47 @@ public class TwitterClient extends OAuthBaseClient {
             public void onSuccess(int statusCode, Header[] headers, String responseString) {
                 Gson gson = Utils.getGson();
                 ArrayList<Tweet> tweets = gson.fromJson(responseString,
+                        new TypeToken<ArrayList<Tweet>>() {
+                        }.getType());
+                callback.onSuccess(tweets);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                callback.onError(new TwitterError(throwable != null ? throwable.getMessage() : null));
+            }
+        });
+    }
+
+    /**
+     * Favorites Timeline
+     *
+     * @param request  Request
+     * @param callback Callback
+     */
+    public void searchTweets(TimelineRequest request,
+                             final TimelineCallback callback) {
+        String apiUrl = getApiUrl("search/tweets.json");
+
+        RequestParams params = new RequestParams();
+        if (request != null) {
+            if (request.getSinceId() != null) {
+                params.put("since_id", request.getSinceId());
+            }
+            if (request.getMaxId() != null) {
+                params.put("max_id", request.getMaxId());
+            }
+            if (request.getQuery() != null) {
+                params.put("q", request.getQuery());
+            }
+        }
+
+        client.get(apiUrl, params, new TextHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                Gson gson = Utils.getGson();
+                JsonObject jsonObject = new Gson().fromJson(responseString, JsonObject.class);
+                ArrayList<Tweet> tweets = gson.fromJson(jsonObject.get("statuses").getAsJsonArray(),
                         new TypeToken<ArrayList<Tweet>>() {
                         }.getType());
                 callback.onSuccess(tweets);

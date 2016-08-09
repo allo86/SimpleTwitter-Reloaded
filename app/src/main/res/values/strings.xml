@@ -46,6 +46,10 @@
     <!-- Following -->
     <string name="following">Following</string>
 
+    <!-- Search -->
+    <string name="search">Search</string>
+    <string name="hint_search">Write something here &#8230;</string>
+
     <!-- Help -->
     <string name="help">Help</string>
 

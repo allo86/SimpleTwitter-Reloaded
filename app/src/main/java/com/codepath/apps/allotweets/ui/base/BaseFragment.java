@@ -11,6 +11,7 @@ import com.codepath.apps.allotweets.network.TwitterClient;
 
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import icepick.Icepick;
 
 /**
  * Created by ALLO on 7/8/16.
@@ -46,12 +47,20 @@ public abstract class BaseFragment extends Fragment {
         if (getArguments() != null) {
             initializeDataFromArguments(getArguments());
         }
+
+        Icepick.restoreInstanceState(this, savedInstanceState);
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Icepick.saveInstanceState(this, outState);
     }
 
     protected abstract int getLayoutResourceID();

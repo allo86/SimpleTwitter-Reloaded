@@ -1,4 +1,4 @@
-package com.codepath.apps.allotweets.ui.timeline;
+package com.codepath.apps.allotweets.ui.base;
 
 import android.app.Activity;
 import android.content.Context;
@@ -19,11 +19,10 @@ import com.codepath.apps.allotweets.network.callbacks.RetweetCallback;
 import com.codepath.apps.allotweets.network.request.FavoriteTweetRequest;
 import com.codepath.apps.allotweets.network.request.RetweetRequest;
 import com.codepath.apps.allotweets.network.utils.Utils;
-import com.codepath.apps.allotweets.ui.base.BaseActivity;
-import com.codepath.apps.allotweets.ui.base.BaseFragment;
 import com.codepath.apps.allotweets.ui.compose.ComposeTweetFragment;
 import com.codepath.apps.allotweets.ui.details.TweetDetailActivity;
 import com.codepath.apps.allotweets.ui.profile.ProfileActivity;
+import com.codepath.apps.allotweets.ui.timeline.TweetsListAdapter;
 import com.codepath.apps.allotweets.ui.utils.DividerItemDecoration;
 import com.codepath.apps.allotweets.ui.utils.EndlessRecyclerViewScrollListener;
 import com.codepath.apps.allotweets.ui.utils.LinearLayoutManager;
@@ -47,7 +46,7 @@ public abstract class BaseTimelineFragment extends BaseFragment implements Compo
     RecyclerView mRecyclerView;
 
     @BindView(R.id.swipe_container)
-    SwipeRefreshLayout mSwipeToRefresh;
+    public SwipeRefreshLayout mSwipeToRefresh;
 
     TweetsListAdapter mAdapter;
     private ArrayList<Tweet> mTweets;

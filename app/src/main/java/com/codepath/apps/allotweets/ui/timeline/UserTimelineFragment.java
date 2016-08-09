@@ -9,6 +9,7 @@ import com.codepath.apps.allotweets.model.TwitterUser;
 import com.codepath.apps.allotweets.network.TwitterError;
 import com.codepath.apps.allotweets.network.callbacks.TimelineCallback;
 import com.codepath.apps.allotweets.network.request.TimelineRequest;
+import com.codepath.apps.allotweets.ui.base.BaseTimelineFragment;
 
 import org.parceler.Parcels;
 

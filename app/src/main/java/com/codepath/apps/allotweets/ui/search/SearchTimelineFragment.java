@@ -1,36 +1,38 @@
-package com.codepath.apps.allotweets.ui.timeline;
+package com.codepath.apps.allotweets.ui.search;
 
 import android.os.Bundle;
 import android.widget.Toast;
 
 import com.codepath.apps.allotweets.R;
 import com.codepath.apps.allotweets.model.Tweet;
-import com.codepath.apps.allotweets.model.TwitterUser;
 import com.codepath.apps.allotweets.network.TwitterError;
 import com.codepath.apps.allotweets.network.callbacks.TimelineCallback;
 import com.codepath.apps.allotweets.network.request.TimelineRequest;
 import com.codepath.apps.allotweets.ui.base.BaseTimelineFragment;
 
-import org.parceler.Parcels;
-
 import java.util.ArrayList;
 
-/**
- * User´ favorite tweets
- * <p/>
- * Created by ALLO on 7/8/16.
- */
-public class UserFavoritesFragment extends BaseTimelineFragment {
+import icepick.State;
 
-    public static UserFavoritesFragment newInstance(TwitterUser user) {
-        UserFavoritesFragment fragment = new UserFavoritesFragment();
+/**
+ * Search Timeline
+ * <p/>
+ * Created by ALLO on 8/8/16.
+ */
+public class SearchTimelineFragment extends BaseTimelineFragment {
+
+    public static final String QUERY = "QUERY";
+
+    public static SearchTimelineFragment newInstance(String query) {
+        SearchTimelineFragment fragment = new SearchTimelineFragment();
         Bundle args = new Bundle();
-        args.putParcelable(BaseTimelineFragment.TWITTER_USER, Parcels.wrap(user));
+        args.putString(QUERY, query);
         fragment.setArguments(args);
         return fragment;
     }
 
-    TwitterUser mUser;
+    @State
+    String mQuery;
 
     @Override
     protected void loadTweets(Long sinceTweetId, Long maxTweetId) {
@@ -39,14 +41,11 @@ public class UserFavoritesFragment extends BaseTimelineFragment {
         TimelineRequest request = new TimelineRequest();
         request.setSinceId(sinceTweetId);
         request.setMaxId(maxTweetId);
-        request.setUserId(mUser.getUserId());
+        request.setQuery(mQuery);
 
-        mTwitterClient.getFavoritesTimeline(request, new TimelineCallback() {
+        mTwitterClient.searchTweets(request, new TimelineCallback() {
             @Override
             public void onSuccess(ArrayList<Tweet> tweets) {
-                // Save in local database
-                saveTweets(tweets);
-
                 // Process tweets
                 processTweets(tweets);
             }
@@ -65,6 +64,6 @@ public class UserFavoritesFragment extends BaseTimelineFragment {
 
     @Override
     protected void initializeDataFromArguments(Bundle args) {
-        mUser = Parcels.unwrap(args.getParcelable(BaseTimelineFragment.TWITTER_USER));
+        mQuery = args.getString(QUERY);
     }
 }

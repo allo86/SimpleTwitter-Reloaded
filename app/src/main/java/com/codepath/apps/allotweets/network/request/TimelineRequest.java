@@ -13,6 +13,8 @@ public class TimelineRequest {
 
     private Long userId;
 
+    private String query;
+
     public TimelineRequest() {
 
     }
@@ -47,5 +49,13 @@ public class TimelineRequest {
 
     public void setUserId(Long userId) {
         this.userId = userId;
+    }
+
+    public String getQuery() {
+        return query;
+    }
+
+    public void setQuery(String query) {
+        this.query = query;
     }
 }

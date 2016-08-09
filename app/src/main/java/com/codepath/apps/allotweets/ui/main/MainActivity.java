@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -22,6 +23,7 @@ import com.codepath.apps.allotweets.ui.base.BaseActivity;
 import com.codepath.apps.allotweets.ui.base.TextView;
 import com.codepath.apps.allotweets.ui.compose.ComposeTweetFragment;
 import com.codepath.apps.allotweets.ui.profile.ProfileActivity;
+import com.codepath.apps.allotweets.ui.search.SearchActivity;
 
 import org.parceler.Parcels;
 
@@ -91,8 +93,19 @@ public class MainActivity extends BaseActivity implements ComposeTweetFragment.O
     public boolean onOptionsItemSelected(MenuItem item) {
         if (mActionBarDrawerToggle.onOptionsItemSelected(item)) {
             return true;
+        } else if (item.getItemId() == R.id.ic_search) {
+            goToSearch();
+            return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
     }
 
     // `onPostCreate` called when activity start-up is complete after `onStart()`
@@ -177,6 +190,11 @@ public class MainActivity extends BaseActivity implements ComposeTweetFragment.O
     private void goToProfile(TwitterUser user) {
         Intent intent = new Intent(this, ProfileActivity.class);
         intent.putExtra(ProfileActivity.TWITTER_USER, Parcels.wrap(user));
+        startActivity(intent);
+    }
+
+    private void goToSearch() {
+        Intent intent = new Intent(this, SearchActivity.class);
         startActivity(intent);
     }
 
