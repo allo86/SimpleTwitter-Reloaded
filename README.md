@@ -2,7 +2,7 @@
 
 **ALLOTweetsApp** is an android app that allows a user to view home and mentions timelines, view user profiles with user timelines, as well as compose and post a new tweet. The app utilizes [Twitter REST API](https://dev.twitter.com/rest/public).
 
-Time spent: **12** hours spent in total
+Time spent: **19** hours spent in total
 
 ## User Stories
 
@@ -36,11 +36,11 @@ The following **bonus** features are implemented:
 
 * [x] Use Parcelable instead of Serializable using the popular [Parceler library](http://guides.codepath.com/android/Using-Parceler).
 * [x] Apply the popular [Butterknife annotation library](http://guides.codepath.com/android/Reducing-View-Boilerplate-with-Butterknife) to reduce view boilerplate.
-* [ ] User can view their direct messages (or send new ones)
+* [x] User can view their direct messages
 
 The following **additional** features are implemented:
 
-* [ ] List anything else that you can get done to improve the app functionality!
+* [x] User can follow/unfollow other users
 
 ## Video Walkthrough
 

@@ -3,16 +3,18 @@ package com.codepath.apps.allotweets.ui.main;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.codepath.apps.allotweets.R;
@@ -48,6 +50,12 @@ public class MainActivity extends BaseActivity implements ComposeTweetFragment.O
 
     @BindView(R.id.sliding_tabs)
     TabLayout mTabLayout;
+
+    @BindView(R.id.fab_tweet)
+    FloatingActionButton mFabTweet;
+
+    @BindView(R.id.fab_message)
+    FloatingActionButton mFabMessage;
 
     // Toolbar drawer
     private ActionBarDrawerToggle mActionBarDrawerToggle;
@@ -87,6 +95,9 @@ public class MainActivity extends BaseActivity implements ComposeTweetFragment.O
                 .bitmapTransform(new CropCircleTransformation(this))
                 .into(ivAvatar);
         tvScreenname.setText(DataManager.sharedInstance().getUser().getScreennameForDisplay());
+
+        // Update fab
+        updateFab(selectedTabPosition);
     }
 
     @Override
@@ -165,8 +176,43 @@ public class MainActivity extends BaseActivity implements ComposeTweetFragment.O
      * Method that sets initial configuration for TabLayout
      */
     private void setUpTabs() {
+        mViewPager.setOffscreenPageLimit(3);
         mViewPager.setAdapter(new MainFragmentPagerAdapter(getSupportFragmentManager(), this));
         mTabLayout.setupWithViewPager(mViewPager);
+
+        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                updateFab(position);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
+        mTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
     }
 
     /**
@@ -180,11 +226,12 @@ public class MainActivity extends BaseActivity implements ComposeTweetFragment.O
                 goToProfile(DataManager.sharedInstance().getUser());
                 break;
             case R.id.nav_help:
-                Toast.makeText(this, "help", Toast.LENGTH_SHORT).show();
+                goToHelp();
                 break;
             default:
                 break;
         }
+        toggleDrawer();
     }
 
     private void goToProfile(TwitterUser user) {
@@ -193,9 +240,24 @@ public class MainActivity extends BaseActivity implements ComposeTweetFragment.O
         startActivity(intent);
     }
 
+    private void goToHelp() {
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_TEXT, "https://support.twitter.com/#topic_223");
+        startActivity(Intent.createChooser(shareIntent, "Share link using"));
+    }
+
     private void goToSearch() {
         Intent intent = new Intent(this, SearchActivity.class);
         startActivity(intent);
+    }
+
+    private void toggleDrawer() {
+        if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+            mDrawerLayout.closeDrawer(GravityCompat.START);
+        } else {
+            mDrawerLayout.openDrawer(GravityCompat.START);
+        }
     }
 
     /**
@@ -221,6 +283,20 @@ public class MainActivity extends BaseActivity implements ComposeTweetFragment.O
         mAdapter.notifyDataSetChanged(mTweets);
         mLayoutManager.scrollToPosition(0);
         */
+    }
+
+    private void updateFab(int position) {
+        /*
+        if (position == 2) {
+            mFabMessage.setVisibility(View.VISIBLE);
+            mFabTweet.setVisibility(View.GONE);
+        } else {
+            mFabMessage.setVisibility(View.GONE);
+            mFabTweet.setVisibility(View.VISIBLE);
+        }
+        */
+        mFabMessage.setVisibility(View.GONE);
+        mFabTweet.setVisibility(View.VISIBLE);
     }
 
 }

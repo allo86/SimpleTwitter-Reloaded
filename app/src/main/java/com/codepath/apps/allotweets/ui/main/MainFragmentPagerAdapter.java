@@ -13,6 +13,7 @@ import android.text.style.ImageSpan;
 import com.codepath.apps.allotweets.R;
 import com.codepath.apps.allotweets.ui.timeline.HomeTimelineFragment;
 import com.codepath.apps.allotweets.ui.timeline.MentionsTimelineFragment;
+import com.codepath.apps.allotweets.ui.timeline.MessagesFragment;
 
 /**
  * FragmentPagerAdapter used in the MainActivity
@@ -20,7 +21,7 @@ import com.codepath.apps.allotweets.ui.timeline.MentionsTimelineFragment;
  * Created by ALLO on 7/8/16.
  */
 public class MainFragmentPagerAdapter extends FragmentPagerAdapter {
-    private static final int PAGE_COUNT = 2;
+    private static final int PAGE_COUNT = 3;
 
     private Context context;
 
@@ -41,6 +42,8 @@ public class MainFragmentPagerAdapter extends FragmentPagerAdapter {
                 return new HomeTimelineFragment();
             case 1:
                 return new MentionsTimelineFragment();
+            case 2:
+                return new MessagesFragment();
             default:
                 return new HomeTimelineFragment();
         }
@@ -62,6 +65,8 @@ public class MainFragmentPagerAdapter extends FragmentPagerAdapter {
                 return R.drawable.ic_home;
             case 1:
                 return R.drawable.ic_mention;
+            case 2:
+                return R.drawable.ic_message;
             default:
                 return R.drawable.ic_home;
         }

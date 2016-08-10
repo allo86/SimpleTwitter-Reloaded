@@ -1,11 +1,10 @@
 package com.codepath.apps.allotweets.model;
 
-import android.text.format.DateUtils;
-
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
+import com.codepath.apps.allotweets.ui.utils.TimeFormatter;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -215,8 +214,9 @@ public class Tweet extends Model {
     }
 
     public String getRelativeTimeAgo() {
-        long dateMillis = getCreatedAt().getTime();
-        return DateUtils.getRelativeTimeSpanString(dateMillis, System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS).toString();
+        //long dateMillis = getCreatedAt().getTime();
+        //return DateUtils.getRelativeTimeSpanString(dateMillis, System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS).toString();
+        return TimeFormatter.getTimeDifference(getCreatedAt());
     }
 
     public boolean hasVideo() {

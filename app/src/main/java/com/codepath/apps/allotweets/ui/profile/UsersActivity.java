@@ -116,7 +116,7 @@ public class UsersActivity extends BaseActivity {
             if (Utils.isOnline()) {
                 loadUsers();
             } else {
-                Toast.makeText(this, R.string.error_no_internet, Toast.LENGTH_LONG).show();
+                Toast.makeText(this, R.string.error_no_internet_action, Toast.LENGTH_LONG).show();
                 onBackPressed();
             }
         }

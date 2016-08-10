@@ -16,7 +16,7 @@ import com.codepath.apps.allotweets.ui.timeline.UserTimelineFragment;
  * Created by ALLO on 7/8/16.
  */
 public class ProfileFragmentPagerAdapter extends FragmentPagerAdapter {
-    private static final int PAGE_COUNT = 3;
+    private static final int PAGE_COUNT = 2;
 
     private Context context;
     private TwitterUser user;
@@ -39,8 +39,6 @@ public class ProfileFragmentPagerAdapter extends FragmentPagerAdapter {
                 return UserTimelineFragment.newInstance(user);
             case 1:
                 return UserFavoritesFragment.newInstance(user);
-            case 2:
-                return UserFavoritesFragment.newInstance(user);
             default:
                 return UserTimelineFragment.newInstance(user);
         }
@@ -52,8 +50,6 @@ public class ProfileFragmentPagerAdapter extends FragmentPagerAdapter {
             case 0:
                 return context.getString(R.string.tab_tweets);
             case 1:
-                return context.getString(R.string.tab_media);
-            case 2:
                 return context.getString(R.string.tab_likes);
             default:
                 return context.getString(R.string.tab_tweets);

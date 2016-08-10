@@ -14,7 +14,7 @@ import com.codepath.apps.allotweets.data.DataManager;
 import com.codepath.apps.allotweets.model.TwitterUser;
 import com.codepath.apps.allotweets.network.TwitterClient;
 import com.codepath.apps.allotweets.network.TwitterError;
-import com.codepath.apps.allotweets.network.callbacks.AuthenticatedUserProfileCallback;
+import com.codepath.apps.allotweets.network.callbacks.TwitterUserCallback;
 import com.codepath.apps.allotweets.network.utils.Utils;
 import com.codepath.apps.allotweets.ui.main.MainActivity;
 import com.codepath.oauth.OAuthLoginActionBarActivity;
@@ -66,7 +66,7 @@ public class LoginActivity extends OAuthLoginActionBarActivity<TwitterClient> {
 
         if (Utils.isOnline()) {
             TwitterClient twitterClient = TwitterApplication.getRestClient();
-            twitterClient.getAuthenticatedUserProfile(new AuthenticatedUserProfileCallback() {
+            twitterClient.getAuthenticatedUserProfile(new TwitterUserCallback() {
                 @Override
                 public void onSuccess(TwitterUser user) {
                     // Save user in SharedPreferences

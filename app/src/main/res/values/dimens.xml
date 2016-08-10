@@ -23,14 +23,13 @@
     <dimen name="input_status_font_size">18sp</dimen>
 
     <!-- Tweet details -->
-    <dimen name="avatar_details_size">60dp</dimen>
     <dimen name="tweet_details_name_font_size">17sp</dimen>
     <dimen name="tweet_details_alias_font_size">15sp</dimen>
     <dimen name="tweet_details_status_font_size">18sp</dimen>
     <dimen name="tweet_details_date_font_size">16sp</dimen>
 
     <!-- Profile -->
-    <dimen name="profile_description_font_size">16sp</dimen>
-    <dimen name="profile_following_followers_font_size">14sp</dimen>
+    <dimen name="profile_description_font_size">14sp</dimen>
+    <dimen name="profile_following_followers_font_size">12sp</dimen>
 
 </resources>

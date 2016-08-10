@@ -2,13 +2,15 @@ package com.codepath.apps.allotweets.network;
 
 import android.content.Context;
 
+import com.codepath.apps.allotweets.model.Message;
 import com.codepath.apps.allotweets.model.Tweet;
 import com.codepath.apps.allotweets.model.TwitterUser;
-import com.codepath.apps.allotweets.network.callbacks.AuthenticatedUserProfileCallback;
 import com.codepath.apps.allotweets.network.callbacks.FavoriteTweetCallback;
+import com.codepath.apps.allotweets.network.callbacks.MessagesCallback;
 import com.codepath.apps.allotweets.network.callbacks.PostTweetCallback;
 import com.codepath.apps.allotweets.network.callbacks.RetweetCallback;
 import com.codepath.apps.allotweets.network.callbacks.TimelineCallback;
+import com.codepath.apps.allotweets.network.callbacks.TwitterUserCallback;
 import com.codepath.apps.allotweets.network.callbacks.TwitterUsersCallback;
 import com.codepath.apps.allotweets.network.request.FavoriteTweetRequest;
 import com.codepath.apps.allotweets.network.request.RetweetRequest;
@@ -82,10 +84,37 @@ public class TwitterClient extends OAuthBaseClient {
      *
      * @param callback Callback
      */
-    public void getAuthenticatedUserProfile(final AuthenticatedUserProfileCallback callback) {
+    public void getAuthenticatedUserProfile(final TwitterUserCallback callback) {
         String apiUrl = getApiUrl("account/verify_credentials.json");
 
         RequestParams params = new RequestParams();
+
+        client.get(apiUrl, params, new TextHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                Gson gson = Utils.getGson();
+                TwitterUser user = gson.fromJson(responseString, TwitterUser.class);
+                callback.onSuccess(user);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                callback.onError(new TwitterError(throwable != null ? throwable.getMessage() : null));
+            }
+        });
+    }
+
+    /**
+     * Authenticated user profile
+     *
+     * @param callback Callback
+     */
+    public void getUserProfile(Long userId,
+                               final TwitterUserCallback callback) {
+        String apiUrl = getApiUrl("users/show.json");
+
+        RequestParams params = new RequestParams();
+        params.put("user_id", userId);
 
         client.get(apiUrl, params, new TextHttpResponseHandler() {
             @Override
@@ -258,7 +287,7 @@ public class TwitterClient extends OAuthBaseClient {
     }
 
     /**
-     * Favorites Timeline
+     * Search tweets
      *
      * @param request  Request
      * @param callback Callback
@@ -289,6 +318,44 @@ public class TwitterClient extends OAuthBaseClient {
                         new TypeToken<ArrayList<Tweet>>() {
                         }.getType());
                 callback.onSuccess(tweets);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                callback.onError(new TwitterError(throwable != null ? throwable.getMessage() : null));
+            }
+        });
+    }
+
+    /**
+     * Direct messages
+     *
+     * @param request  Request
+     * @param callback Callback
+     */
+    public void getDirectMessages(TimelineRequest request,
+                                  final MessagesCallback callback) {
+        String apiUrl = getApiUrl("direct_messages.json");
+
+        RequestParams params = new RequestParams();
+        if (request != null) {
+            params.put("count", request.getCount());
+            if (request.getSinceId() != null) {
+                params.put("since_id", request.getSinceId());
+            }
+            if (request.getMaxId() != null) {
+                params.put("max_id", request.getMaxId());
+            }
+        }
+
+        client.get(apiUrl, params, new TextHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                Gson gson = Utils.getGson();
+                ArrayList<Message> messages = gson.fromJson(responseString,
+                        new TypeToken<ArrayList<Message>>() {
+                        }.getType());
+                callback.onSuccess(messages);
             }
 
             @Override
@@ -462,6 +529,62 @@ public class TwitterClient extends OAuthBaseClient {
             @Override
             public void onSuccess(int statusCode, Header[] headers, String responseString) {
                 callback.onSuccess(Utils.getGson().fromJson(responseString, TwitterUsersResponse.class));
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                callback.onError(new TwitterError(throwable != null ? throwable.getMessage() : null));
+            }
+        });
+    }
+
+    /**
+     * Follow user
+     *
+     * @param user     TwitterUser
+     * @param callback Callback
+     */
+    public void followUser(TwitterUser user,
+                           final TwitterUserCallback callback) {
+        String apiUrl = getApiUrl("friendships/create.json");
+
+        RequestParams params = new RequestParams();
+        params.put("user_id", user.getUserId());
+
+        client.post(apiUrl, params, new TextHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                Gson gson = Utils.getGson();
+                TwitterUser user = gson.fromJson(responseString, TwitterUser.class);
+                callback.onSuccess(user);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                callback.onError(new TwitterError(throwable != null ? throwable.getMessage() : null));
+            }
+        });
+    }
+
+    /**
+     * Unfollow user
+     *
+     * @param user     TwitterUser
+     * @param callback Callback
+     */
+    public void unfollowUser(TwitterUser user,
+                             final TwitterUserCallback callback) {
+        String apiUrl = getApiUrl("friendships/destroy.json");
+
+        RequestParams params = new RequestParams();
+        params.put("user_id", user.getUserId());
+
+        client.post(apiUrl, params, new TextHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                Gson gson = Utils.getGson();
+                TwitterUser user = gson.fromJson(responseString, TwitterUser.class);
+                callback.onSuccess(user);
             }
 
             @Override

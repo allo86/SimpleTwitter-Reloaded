@@ -250,7 +250,7 @@ public abstract class BaseTimelineFragment extends BaseFragment implements Compo
             ComposeTweetFragment editNameDialogFragment = ComposeTweetFragment.newInstance(this, tweet);
             editNameDialogFragment.show(fm, "compose_tweet");
         } else {
-            Toast.makeText(getActivity(), getString(R.string.error_no_internet), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), getString(R.string.error_no_internet_action), Toast.LENGTH_SHORT).show();
         }
     }
 
