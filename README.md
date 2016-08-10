@@ -40,6 +40,8 @@ The following **bonus** features are implemented:
 
 The following **additional** features are implemented:
 
+* [x] Custom GSON deserializer for some objects
+* [x] Hide toolbar on scroll
 * [x] User can follow/unfollow other users
 * [x] User can play videos in the "detail view"
 * [x] User can go to help web through the side menu
@@ -62,7 +64,15 @@ Describe any challenges encountered while building the app.
 ## Open-source libraries used
 
 - [Android Async HTTP](https://github.com/loopj/android-async-http) - Simple asynchronous HTTP requests with JSON parsing
-- [Picasso](http://square.github.io/picasso/) - Image loading and caching library for Android
+- [Glide](https://github.com/bumptech/glide) - An image loading and caching library for Android focused on smooth scrolling
+- [Butterknife](http://jakewharton.github.io/butterknife/) - Bind Android views and callbacks to fields and methods
+- [Icepick](https://github.com/frankiesardo/icepick) - Android Instance State made easy
+- [GSON](https://github.com/google/gson) - A Java serialization/deserialization library that can convert Java Objects into JSON and back
+- [Parceler](https://github.com/johncarl81/parceler) - Android Parcelables made easy through code generation
+- [RecyclerView Animators](https://github.com/wasabeef/recyclerview-animators) - An Android Animation library which easily add itemanimator to RecyclerView items
+- [Retrofit](http://square.github.io/retrofit/) - A type-safe HTTP client for Android and Java
+- [ActiveAndroid](http://www.activeandroid.com/) - Active record style SQLite persistence for Android
+- [VideoPlayerManager](https://github.com/danylovolokh/VideoPlayerManager) - Project designed to help controlling Android MediaPlayer class
 
 ## License
 

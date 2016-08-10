@@ -51,6 +51,7 @@ import java.util.regex.Pattern;
 import butterknife.BindView;
 import butterknife.OnClick;
 import icepick.State;
+import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 
 public class TweetDetailActivity extends BaseActivity implements ComposeTweetFragment.OnComposeTweetFragmentListener {
 
@@ -137,28 +138,11 @@ public class TweetDetailActivity extends BaseActivity implements ComposeTweetFra
 
     @Override
     protected void showData() {
-        /*
-        Picasso.with(ivAvatar.getContext())
-                .load(mTweet.getUser().getProfileImageUrl())
-                .placeholder(R.drawable.ic_twitter_gray)
-                .fit()
-                .transform(new RoundedCornersTransformation(10, 10))
-                .into(ivAvatar);
-        */
         Glide.with(this)
                 .load(mTweet.getUser().getProfileImageUrl())
                 .placeholder(R.drawable.ic_twitter_gray)
-                .into(new SimpleTarget<GlideDrawable>() {
-                    @Override
-                    public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
-                        ivAvatar.setImageDrawable(resource);
-                    }
-
-                    @Override
-                    public void onLoadFailed(Exception e, Drawable errorDrawable) {
-                        Log.d(TAG_LOG, e.getMessage());
-                    }
-                });
+                .bitmapTransform(new RoundedCornersTransformation(this, 3, 3))
+                .into(ivAvatar);
 
         tvName.setText(mTweet.getUser().getName());
         tvScreenname.setText(mTweet.getUser().getScreennameForDisplay());

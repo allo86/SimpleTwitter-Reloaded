@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 
 /**
  * Tweets List Adapter
@@ -206,17 +207,8 @@ public class TweetsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             Glide.with(ivAvatar.getContext())
                     .load(tweet.getUser().getProfileImageUrl())
                     .placeholder(R.drawable.ic_twitter)
-                    .into(new SimpleTarget<GlideDrawable>() {
-                        @Override
-                        public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
-                            ivAvatar.setImageDrawable(resource);
-                        }
-
-                        @Override
-                        public void onLoadFailed(Exception e, Drawable errorDrawable) {
-                            Log.d(TAG_LOG, e.getMessage());
-                        }
-                    });
+                    .bitmapTransform(new RoundedCornersTransformation(ivAvatar.getContext(), 3, 3))
+                    .into(ivAvatar);
 
             tvName.setText(tweet.getUser().getName());
             tvUser.setText(tweet.getUser().getScreennameForDisplay());

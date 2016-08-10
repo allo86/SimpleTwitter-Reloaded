@@ -32,6 +32,7 @@ import java.util.Locale;
 import butterknife.BindView;
 import butterknife.OnClick;
 import icepick.State;
+import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 
 /**
  * Profile Activity
@@ -121,7 +122,6 @@ public class ProfileActivity extends BaseActivity {
         if (mUser.hasProfileBackgroundImage()) {
             Glide.with(this)
                     .load(mUser.getProfileBannerUrl())
-                    //.placeholder(R.drawable.ic_twitter)
                     .centerCrop()
                     .into(ivBackground);
         }
@@ -129,6 +129,7 @@ public class ProfileActivity extends BaseActivity {
         Glide.with(this)
                 .load(mUser.getProfileImageUrl())
                 .placeholder(R.drawable.ic_twitter)
+                .bitmapTransform(new RoundedCornersTransformation(this, 3, 3))
                 .into(ivAvatar);
 
         if (mUser.getDescription() != null && !"".equals(mUser.getDescription())) {
