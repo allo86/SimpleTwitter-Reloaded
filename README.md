@@ -43,6 +43,9 @@ The following **additional** features are implemented:
 * [x] User can follow/unfollow other users
 * [x] User can play videos in the "detail view"
 * [x] User can go to help web through the side menu
+* [x] User can **"reply" to any tweet (timeline, detail view)**
+  * [x] The user that wrote the original tweet is automatically "@" replied in compose
+  * [x] If other users where mentioned in the original tweet, they are "@" replied too
 
 ## Video Walkthrough
 
