@@ -24,6 +24,7 @@ import com.codepath.apps.allotweets.R;
 import com.codepath.apps.allotweets.TwitterApplication;
 import com.codepath.apps.allotweets.data.DataManager;
 import com.codepath.apps.allotweets.model.Tweet;
+import com.codepath.apps.allotweets.model.TwitterUser;
 import com.codepath.apps.allotweets.network.TwitterClient;
 import com.codepath.apps.allotweets.network.TwitterError;
 import com.codepath.apps.allotweets.network.callbacks.PostTweetCallback;
@@ -170,6 +171,14 @@ public class ComposeTweetFragment extends DialogFragment {
         if (mTweet != null) {
             tvInReply.setText(getString(R.string.in_reply_to, mTweet.getUser().getScreennameForDisplay()));
             tvInReply.setVisibility(View.VISIBLE);
+            StringBuilder sbUsers = new StringBuilder();
+            if (!mTweet.getEntities().getUserMentions().contains(mTweet.getUser())) {
+                sbUsers.append(mTweet.getUser().getScreennameForDisplay()).append(" ");
+            }
+            for (TwitterUser user : mTweet.getEntities().getUserMentions()) {
+                sbUsers.append(user.getScreennameForDisplay()).append(" ");
+            }
+            inputStatus.append(sbUsers.toString());
         } else {
             tvInReply.setVisibility(View.GONE);
         }

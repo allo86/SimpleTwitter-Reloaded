@@ -134,7 +134,7 @@ public class MessagesFragment extends BaseFragment {
     }
 
     protected void loadMessages(Long sinceMessageId, Long maxMessageId) {
-        Toast.makeText(getActivity(), R.string.loading_more_tweets, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), R.string.loading_more_results, Toast.LENGTH_SHORT).show();
 
         TimelineRequest request = new TimelineRequest();
         request.setSinceId(sinceMessageId);

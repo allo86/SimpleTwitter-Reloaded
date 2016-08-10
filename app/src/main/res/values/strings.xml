@@ -17,7 +17,7 @@
 
     <!-- Home Timeline -->
     <string name="home_timeline">Home</string>
-    <string name="loading_more_tweets">Loading more tweets &#8230;</string>
+    <string name="loading_more_results">Loading more results &#8230;</string>
     <string name="loading_offline_tweets">There seems to be no internet connection available. You will see the last storaged tweets</string>
 
     <!-- Mentions -->
@@ -25,7 +25,7 @@
 
     <!-- Compose Tweet -->
     <string name="tweet">Tweet</string>
-    <string name="in_reply_to">In reply to \@%1$s</string>
+    <string name="in_reply_to">In reply to %1$s</string>
 
     <!-- Tweet detail -->
     <string name="number_of_retweets">%1$s RETWEETS</string>

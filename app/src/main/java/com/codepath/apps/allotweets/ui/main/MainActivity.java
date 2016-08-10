@@ -2,6 +2,7 @@ package com.codepath.apps.allotweets.ui.main;
 
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -15,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.codepath.apps.allotweets.R;
@@ -241,10 +243,12 @@ public class MainActivity extends BaseActivity implements ComposeTweetFragment.O
     }
 
     private void goToHelp() {
-        Intent shareIntent = new Intent(Intent.ACTION_SEND);
-        shareIntent.setType("text/plain");
-        shareIntent.putExtra(Intent.EXTRA_TEXT, "https://support.twitter.com/#topic_223");
-        startActivity(Intent.createChooser(shareIntent, "Share link using"));
+        try {
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://support.twitter.com/#topic_223"));
+            startActivity(browserIntent);
+        } catch (Exception ex) {
+            Toast.makeText(this, R.string.error_general_request, Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void goToSearch() {

@@ -20,7 +20,7 @@ import java.util.ArrayList;
 public class MentionsTimelineFragment extends BaseTimelineFragment {
     @Override
     protected void loadTweets(Long sinceTweetId, Long maxTweetId) {
-        Toast.makeText(getActivity(), R.string.loading_more_tweets, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), R.string.loading_more_results, Toast.LENGTH_SHORT).show();
 
         TimelineRequest request = new TimelineRequest();
         request.setSinceId(sinceTweetId);
