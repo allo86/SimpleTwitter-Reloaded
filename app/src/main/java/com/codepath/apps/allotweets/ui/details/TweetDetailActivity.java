@@ -31,6 +31,7 @@ import com.codepath.apps.allotweets.network.callbacks.FavoriteTweetCallback;
 import com.codepath.apps.allotweets.network.callbacks.RetweetCallback;
 import com.codepath.apps.allotweets.network.request.FavoriteTweetRequest;
 import com.codepath.apps.allotweets.network.request.RetweetRequest;
+import com.codepath.apps.allotweets.network.utils.Utils;
 import com.codepath.apps.allotweets.ui.base.BaseActivity;
 import com.codepath.apps.allotweets.ui.base.TextView;
 import com.codepath.apps.allotweets.ui.compose.ComposeTweetFragment;
@@ -138,14 +139,18 @@ public class TweetDetailActivity extends BaseActivity implements ComposeTweetFra
 
     @Override
     protected void showData() {
-        Glide.with(this)
-                .load(mTweet.getUser().getProfileImageUrl())
-                .placeholder(R.drawable.ic_twitter_gray)
-                .bitmapTransform(new RoundedCornersTransformation(this, 3, 3))
-                .into(ivAvatar);
+        if (mTweet.getUser() != null) {
+            if (mTweet.getUser().getProfileImageUrl() != null) {
+                Glide.with(this)
+                        .load(mTweet.getUser().getProfileImageUrl())
+                        .placeholder(R.drawable.ic_twitter_gray)
+                        .bitmapTransform(new RoundedCornersTransformation(this, 3, 3))
+                        .into(ivAvatar);
+            }
 
-        tvName.setText(mTweet.getUser().getName());
-        tvScreenname.setText(mTweet.getUser().getScreennameForDisplay());
+            tvName.setText(mTweet.getUser().getName());
+            tvScreenname.setText(mTweet.getUser().getScreennameForDisplay());
+        }
         tvStatus.setText(mTweet.getText());
         tvDate.setText(mTweet.getFormattedCreatedAtDate());
 
@@ -266,6 +271,11 @@ public class TweetDetailActivity extends BaseActivity implements ComposeTweetFra
 
     @OnClick(R.id.bt_reply)
     public void reply() {
+        if (!Utils.isOnline()) {
+            Toast.makeText(this, R.string.error_no_internet_action, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         FragmentManager fm = getSupportFragmentManager();
         ComposeTweetFragment editNameDialogFragment = ComposeTweetFragment.newInstance(this, mTweet);
         editNameDialogFragment.show(fm, "compose_tweet");
@@ -273,70 +283,78 @@ public class TweetDetailActivity extends BaseActivity implements ComposeTweetFra
 
     @OnClick(R.id.bt_retweet)
     public void retweet() {
-        btRetweet.setVisibility(View.INVISIBLE);
-        pbRetweet.setVisibility(View.VISIBLE);
+        if (Utils.isOnline()) {
+            btRetweet.setVisibility(View.INVISIBLE);
+            pbRetweet.setVisibility(View.VISIBLE);
 
-        final RetweetRequest request = new RetweetRequest();
-        if (mTweet.isRetweeted()) {
-            // Undo retweet
-            request.setUndo(true);
-            request.setTweetId(mTweet.getRetweetedStatus() != null ? mTweet.getRetweetedStatus().getTweetId() : mTweet.getTweetId());
-        } else {
-            // Retweet
-            request.setUndo(false);
-            request.setTweetId(mTweet.getTweetId());
-        }
+            final RetweetRequest request = new RetweetRequest();
+            if (mTweet.isRetweeted()) {
+                // Undo retweet
+                request.setUndo(true);
+                request.setTweetId(mTweet.getRetweetedStatus() != null ? mTweet.getRetweetedStatus().getTweetId() : mTweet.getTweetId());
+            } else {
+                // Retweet
+                request.setUndo(false);
+                request.setTweetId(mTweet.getTweetId());
+            }
 
-        mTwitterClient.retweet(request, new RetweetCallback() {
-            @Override
-            public void onSuccess(Tweet retweet) {
-                // Weird bug ... this request does not return the favorites information
-                // Fix
-                int favoriteCount = mTweet.getRetweetedStatus() != null ? mTweet.getRetweetedStatus().getFavoriteCount() : mTweet.getFavoriteCount();
+            mTwitterClient.retweet(request, new RetweetCallback() {
+                @Override
+                public void onSuccess(Tweet retweet) {
+                    // Weird bug ... this request does not return the favorites information
+                    // Fix
+                    int favoriteCount = mTweet.getRetweetedStatus() != null ? mTweet.getRetweetedStatus().getFavoriteCount() : mTweet.getFavoriteCount();
 
-                if (request.isUndo()) {
-                    mTweet.setRetweetCount(mTweet.getRetweetCount() - 1);
-                    mTweet.setRetweetedStatus(retweet);
-                    mTweet.setRetweeted(false);
-                } else {
-                    mTweet.setRetweetCount(mTweet.getRetweetCount() + 1);
-                    mTweet.setRetweetedStatus(retweet);
-                    mTweet.setRetweeted(true);
+                    if (request.isUndo()) {
+                        mTweet.setRetweetCount(mTweet.getRetweetCount() - 1);
+                        mTweet.setRetweetedStatus(retweet);
+                        mTweet.setRetweeted(false);
+                    } else {
+                        mTweet.setRetweetCount(mTweet.getRetweetCount() + 1);
+                        mTweet.setRetweetedStatus(retweet);
+                        mTweet.setRetweeted(true);
+                    }
+                    mTweet.setFavoriteCount(favoriteCount);
+                    if (mTweet.getRetweetedStatus() != null)
+                        mTweet.getRetweetedStatus().setFavoriteCount(favoriteCount);
+                    updateRetweet();
                 }
-                mTweet.setFavoriteCount(favoriteCount);
-                if (mTweet.getRetweetedStatus() != null)
-                    mTweet.getRetweetedStatus().setFavoriteCount(favoriteCount);
-                updateRetweet();
-            }
 
-            @Override
-            public void onError(TwitterError error) {
-                Toast.makeText(TweetDetailActivity.this, R.string.error_retweet, Toast.LENGTH_LONG).show();
-                updateRetweet();
-            }
-        });
+                @Override
+                public void onError(TwitterError error) {
+                    Toast.makeText(TweetDetailActivity.this, R.string.error_retweet, Toast.LENGTH_LONG).show();
+                    updateRetweet();
+                }
+            });
+        } else {
+            Toast.makeText(this, R.string.error_no_internet_action, Toast.LENGTH_SHORT).show();
+        }
     }
 
     @OnClick(R.id.bt_favorite)
     public void favorite() {
-        btFavorite.setVisibility(View.INVISIBLE);
-        pbFavorite.setVisibility(View.VISIBLE);
+        if (Utils.isOnline()) {
+            btFavorite.setVisibility(View.INVISIBLE);
+            pbFavorite.setVisibility(View.VISIBLE);
 
-        final FavoriteTweetRequest request = new FavoriteTweetRequest(mTweet.getTweetId(),
-                mTweet.isFavorite());
-        mTwitterClient.markAsFavorite(request, new FavoriteTweetCallback() {
-            @Override
-            public void onSuccess(Tweet retweet) {
-                mTweet = retweet;
-                updateFavorite();
-            }
+            final FavoriteTweetRequest request = new FavoriteTweetRequest(mTweet.getTweetId(),
+                    mTweet.isFavorite());
+            mTwitterClient.markAsFavorite(request, new FavoriteTweetCallback() {
+                @Override
+                public void onSuccess(Tweet retweet) {
+                    mTweet = retweet;
+                    updateFavorite();
+                }
 
-            @Override
-            public void onError(TwitterError error) {
-                Toast.makeText(TweetDetailActivity.this, R.string.error_favorite, Toast.LENGTH_LONG).show();
-                updateFavorite();
-            }
-        });
+                @Override
+                public void onError(TwitterError error) {
+                    Toast.makeText(TweetDetailActivity.this, R.string.error_favorite, Toast.LENGTH_LONG).show();
+                    updateFavorite();
+                }
+            });
+        } else {
+            Toast.makeText(this, R.string.error_no_internet_action, Toast.LENGTH_SHORT).show();
+        }
     }
 
     @OnClick(R.id.iv_avatar)
@@ -345,12 +363,22 @@ public class TweetDetailActivity extends BaseActivity implements ComposeTweetFra
     }
 
     private void goToProfile(TwitterUser twitterUser) {
+        if (!Utils.isOnline()) {
+            Toast.makeText(this, R.string.error_no_internet_action, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         Intent intent = new Intent(this, ProfileActivity.class);
         intent.putExtra(ProfileActivity.TWITTER_USER, Parcels.wrap(twitterUser));
         startActivity(intent);
     }
 
     private void goToSearch(Hashtag hashtag) {
+        if (!Utils.isOnline()) {
+            Toast.makeText(this, R.string.error_no_internet_action, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
         Intent intent = new Intent(this, SearchActivity.class);
         intent.putExtra(SearchActivity.QUERY, hashtag.getTextForDisplay());
         startActivity(intent);

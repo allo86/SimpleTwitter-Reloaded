@@ -204,14 +204,17 @@ public class TweetsListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                     .transform(new RoundedCornersTransformation(10, 10))
                     .into(ivAvatar);
             */
-            Glide.with(ivAvatar.getContext())
-                    .load(tweet.getUser().getProfileImageUrl())
-                    .placeholder(R.drawable.ic_twitter)
-                    .bitmapTransform(new RoundedCornersTransformation(ivAvatar.getContext(), 3, 3))
-                    .into(ivAvatar);
+            if (tweet.getUser() != null) {
+                Glide.with(ivAvatar.getContext())
+                        .load(tweet.getUser().getProfileImageUrl())
+                        .placeholder(R.drawable.ic_twitter)
+                        .bitmapTransform(new RoundedCornersTransformation(ivAvatar.getContext(), 3, 3))
+                        .into(ivAvatar);
 
-            tvName.setText(tweet.getUser().getName());
-            tvUser.setText(tweet.getUser().getScreennameForDisplay());
+                tvName.setText(tweet.getUser().getName());
+                tvUser.setText(tweet.getUser().getScreennameForDisplay());
+            }
+
             tvText.setText(tweet.getText());
             tvDate.setText(tweet.getRelativeTimeAgo());
 

@@ -21,14 +21,17 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.codepath.apps.allotweets.R;
 import com.codepath.apps.allotweets.data.DataManager;
+import com.codepath.apps.allotweets.eventbus.TweetEvent;
 import com.codepath.apps.allotweets.model.Tweet;
 import com.codepath.apps.allotweets.model.TwitterUser;
+import com.codepath.apps.allotweets.network.utils.Utils;
 import com.codepath.apps.allotweets.ui.base.BaseActivity;
 import com.codepath.apps.allotweets.ui.base.TextView;
 import com.codepath.apps.allotweets.ui.compose.ComposeTweetFragment;
 import com.codepath.apps.allotweets.ui.profile.ProfileActivity;
 import com.codepath.apps.allotweets.ui.search.SearchActivity;
 
+import org.greenrobot.eventbus.EventBus;
 import org.parceler.Parcels;
 
 import butterknife.BindView;
@@ -237,6 +240,11 @@ public class MainActivity extends BaseActivity implements ComposeTweetFragment.O
     }
 
     private void goToProfile(TwitterUser user) {
+        if (!Utils.isOnline()) {
+            Toast.makeText(this, R.string.error_no_internet_action, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         Intent intent = new Intent(this, ProfileActivity.class);
         intent.putExtra(ProfileActivity.TWITTER_USER, Parcels.wrap(user));
         startActivity(intent);
@@ -281,12 +289,7 @@ public class MainActivity extends BaseActivity implements ComposeTweetFragment.O
      */
     @Override
     public void onStatusUpdated(Tweet tweet) {
-        // TODO: Send new tweet to fragments in tab layout
-        /*
-        mTweets.add(0, tweet);
-        mAdapter.notifyDataSetChanged(mTweets);
-        mLayoutManager.scrollToPosition(0);
-        */
+        EventBus.getDefault().post(new TweetEvent(tweet));
     }
 
     private void updateFab(int position) {

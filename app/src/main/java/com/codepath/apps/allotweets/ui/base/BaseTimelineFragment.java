@@ -11,6 +11,8 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.codepath.apps.allotweets.R;
+import com.codepath.apps.allotweets.data.DataManager;
+import com.codepath.apps.allotweets.eventbus.TweetEvent;
 import com.codepath.apps.allotweets.model.Hashtag;
 import com.codepath.apps.allotweets.model.Tweet;
 import com.codepath.apps.allotweets.model.TwitterUser;
@@ -29,6 +31,8 @@ import com.codepath.apps.allotweets.ui.utils.DividerItemDecoration;
 import com.codepath.apps.allotweets.ui.utils.EndlessRecyclerViewScrollListener;
 import com.codepath.apps.allotweets.ui.utils.LinearLayoutManager;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
@@ -50,9 +54,9 @@ public abstract class BaseTimelineFragment extends BaseFragment implements Compo
     @BindView(R.id.swipe_container)
     public SwipeRefreshLayout mSwipeToRefresh;
 
-    TweetsListAdapter mAdapter;
-    private ArrayList<Tweet> mTweets;
-    private LinearLayoutManager mLayoutManager;
+    protected TweetsListAdapter mAdapter;
+    protected ArrayList<Tweet> mTweets;
+    protected LinearLayoutManager mLayoutManager;
 
     private BaseActivity activity;
 
@@ -100,8 +104,10 @@ public abstract class BaseTimelineFragment extends BaseFragment implements Compo
             public void onLoadMore(int page, int totalItemsCount) {
                 // Triggered only when new data needs to be appended to the list
                 // Add whatever code is needed to append new items to the bottom of the list
-                Log.d(TAG_LOG, "loadNextPage: " + String.valueOf(page));
-                loadTweets(null, mTweets.get(totalItemsCount - 1).getTweetId());
+                if (Utils.isOnline()) {
+                    Log.d(TAG_LOG, "loadNextPage: " + String.valueOf(page));
+                    loadTweets(null, mTweets.get(totalItemsCount - 1).getTweetId());
+                }
             }
         };
         mRecyclerView.addOnScrollListener(endlessListener);
@@ -199,6 +205,13 @@ public abstract class BaseTimelineFragment extends BaseFragment implements Compo
     protected void saveTweets(ArrayList<Tweet> tweets) {
         if (tweets != null && tweets.size() > 0) {
             for (Tweet tweet : tweets) {
+                /*
+                if (tweet.getUser() != null) {
+                    Log.d(TAG_LOG, "save user " + tweet.getUser().getScreenname());
+                    tweet.getUser().save();
+                }
+                */
+                Log.d(TAG_LOG, "save tweet " + tweet.getText());
                 tweet.save();
             }
         }
@@ -239,22 +252,32 @@ public abstract class BaseTimelineFragment extends BaseFragment implements Compo
     /* Adapter actions */
 
     private void goToTweetDetails(Tweet tweet) {
+        /*
+        if (!Utils.isOnline()) {
+            Toast.makeText(getActivity(), R.string.error_no_internet_action, Toast.LENGTH_SHORT).show();
+        }
+        */
         Intent intent = new Intent(getActivity(), TweetDetailActivity.class);
         intent.putExtra(TweetDetailActivity.TWEET, Parcels.wrap(tweet));
         startActivityForResult(intent, TweetDetailActivity.REQUEST_CODE);
     }
 
     private void replyTweet(Tweet tweet) {
-        if (Utils.isOnline()) {
-            FragmentManager fm = getActivity().getSupportFragmentManager();
-            ComposeTweetFragment editNameDialogFragment = ComposeTweetFragment.newInstance(this, tweet);
-            editNameDialogFragment.show(fm, "compose_tweet");
-        } else {
-            Toast.makeText(getActivity(), getString(R.string.error_no_internet_action), Toast.LENGTH_SHORT).show();
+        if (!Utils.isOnline()) {
+            Toast.makeText(getActivity(), R.string.error_no_internet_action, Toast.LENGTH_SHORT).show();
+            return;
         }
+        FragmentManager fm = getActivity().getSupportFragmentManager();
+        ComposeTweetFragment editNameDialogFragment = ComposeTweetFragment.newInstance(this, tweet);
+        editNameDialogFragment.show(fm, "compose_tweet");
     }
 
     private void retweet(final Tweet tweet) {
+        if (!Utils.isOnline()) {
+            Toast.makeText(getActivity(), R.string.error_no_internet_action, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         final RetweetRequest request = new RetweetRequest();
         if (tweet.isRetweeted()) {
             // Undo retweet
@@ -297,6 +320,11 @@ public abstract class BaseTimelineFragment extends BaseFragment implements Compo
     }
 
     private void markAsFavorite(final Tweet tweet) {
+        if (!Utils.isOnline()) {
+            Toast.makeText(getActivity(), R.string.error_no_internet_action, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         final FavoriteTweetRequest request = new FavoriteTweetRequest(tweet.getTweetId(), tweet.isFavorite());
 
         mTwitterClient.markAsFavorite(request, new FavoriteTweetCallback() {
@@ -319,6 +347,11 @@ public abstract class BaseTimelineFragment extends BaseFragment implements Compo
     }
 
     private void goToProfile(TwitterUser user) {
+        if (!Utils.isOnline()) {
+            Toast.makeText(getActivity(), R.string.error_no_internet_action, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         if (getActivity() instanceof ProfileActivity) {
             if (((ProfileActivity) getActivity()).getUser().equals(user)) {
                 return;
@@ -330,6 +363,11 @@ public abstract class BaseTimelineFragment extends BaseFragment implements Compo
     }
 
     private void goToHashtag(Hashtag hashtag) {
+        if (!Utils.isOnline()) {
+            Toast.makeText(getActivity(), R.string.error_no_internet_action, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         Intent intent = new Intent(getActivity(), SearchActivity.class);
         intent.putExtra(SearchActivity.QUERY, hashtag.getTextForDisplay());
         startActivity(intent);
@@ -352,7 +390,31 @@ public abstract class BaseTimelineFragment extends BaseFragment implements Compo
      */
     @Override
     public void onStatusUpdated(Tweet tweet) {
-        // TODO: Do something here? Send new tweet to fragments in tab layout?
+        // Send Event
+        EventBus.getDefault().post(new TweetEvent(tweet));
     }
+
+    /* EventBus */
+    @Override
+    public void onResume() {
+        super.onResume();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onPause() {
+        EventBus.getDefault().unregister(this);
+        super.onPause();
+    }
+
+    @Subscribe
+    public void onEvent(TweetEvent event) {
+        if (event.getTweet().getUser().equals(DataManager.sharedInstance().getUser())) {
+            mTweets.add(0, event.getTweet());
+            mAdapter.notifyDataSetChanged(mTweets);
+            mLayoutManager.scrollToPosition(0);
+        }
+    }
+    /* EventBus */
 
 }

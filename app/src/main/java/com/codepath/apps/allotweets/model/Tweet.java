@@ -245,7 +245,7 @@ public class Tweet extends Model {
     }
 
     public static List<Tweet> recentTweets() {
-        return new Select().from(Tweet.class).orderBy("id DESC").limit("300").execute();
+        return new Select().from(Tweet.class).orderBy("tweet_id DESC").limit("300").execute();
     }
 
     @Override

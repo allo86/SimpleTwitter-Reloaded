@@ -4,11 +4,14 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 import com.codepath.apps.allotweets.R;
+import com.codepath.apps.allotweets.eventbus.TweetEvent;
 import com.codepath.apps.allotweets.model.Tweet;
 import com.codepath.apps.allotweets.network.TwitterError;
 import com.codepath.apps.allotweets.network.callbacks.TimelineCallback;
 import com.codepath.apps.allotweets.network.request.TimelineRequest;
 import com.codepath.apps.allotweets.ui.base.BaseTimelineFragment;
+
+import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
 
@@ -52,4 +55,12 @@ public class MentionsTimelineFragment extends BaseTimelineFragment {
     protected void initializeDataFromArguments(Bundle args) {
 
     }
+
+    /* EventBus */
+    @Override
+    @Subscribe
+    public void onEvent(TweetEvent event) {
+        // Do nothing by now
+    }
+    /* EventBus */
 }
