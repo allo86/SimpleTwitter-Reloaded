@@ -33,7 +33,7 @@ public class MentionsTimelineFragment extends BaseTimelineFragment {
             @Override
             public void onSuccess(ArrayList<Tweet> tweets) {
                 // Save in local database
-                saveTweets(tweets);
+                //saveTweets(tweets);
 
                 // Process tweets
                 processTweets(tweets);

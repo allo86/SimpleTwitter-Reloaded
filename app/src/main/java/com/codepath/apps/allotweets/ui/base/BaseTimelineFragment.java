@@ -213,6 +213,10 @@ public abstract class BaseTimelineFragment extends BaseFragment implements Compo
                 */
                 Log.d(TAG_LOG, "save tweet " + tweet.getText());
                 tweet.save();
+                if (tweet.getUser() != null) {
+                    Log.d(TAG_LOG, "save user " + tweet.getUser().getScreenname());
+                    tweet.getUser().save();
+                }
             }
         }
     }

@@ -77,7 +77,7 @@ public class Tweet extends Model {
 
     @SerializedName("user")
     @Expose
-    @Column(name = "users", onUpdate = Column.ForeignKeyAction.CASCADE, onDelete = Column.ForeignKeyAction.CASCADE)
+    @Column(name = "user", onUpdate = Column.ForeignKeyAction.CASCADE, onDelete = Column.ForeignKeyAction.CASCADE)
     TwitterUser user;
 
     @SerializedName("entities")
